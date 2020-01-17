@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { first } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
-import { UserService } from '../_services/user.service';
+import { AuthenticationService } from '../_services';
 
 @Component({
   selector: 'app-login',
@@ -19,21 +19,16 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private userService : UserService
+    private authenticationService : AuthenticationService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
       email: ['', Validators.required],
       password: ['', Validators.required]
-  });
+    });
 
-
-  // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-  //   //if login, redirect to home....
-  //   if (this.authenticationService.currentUserValue) { 
-  //     this.router.navigate(['/']);
-  // }
   }
 
 
@@ -47,15 +42,13 @@ export class LoginComponent implements OnInit {
     }
 
     this.loading = true;
-    this.userService.login(this.fval.email.value, this.fval.password.value)
-        .pipe(first())
+     this.authenticationService.login(this.fval.email.value, this.fval.password.value)
         .subscribe(
             data => {
-              console.log(data,'response from the app----');
               this.router.navigate(['/']);
             },
             error => {
-                alert(error.error.message);
+              this.toastr.error(error.error.message, 'Error');
                 this.loading = false;
             });
   }

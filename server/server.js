@@ -27,8 +27,8 @@ app.use(cors());
 
 app.use((err, req, res, next) => {
   return res.send({
-    "statusCode": util.statusCode.ONE,
-    "statusMessage": util.statusMessage.SOMETHING_WRONG
+    "statusCode": 401,
+    "statusMessage": "Something Went Wrong!"
   });
 });
 

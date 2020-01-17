@@ -50,14 +50,14 @@ let login = async (req, res) => {
         status: true
       };
       const checkEmail = await UserDAO.getUsers(criteria);
-      if (checkEmail) {
+      if (checkEmail && checkEmail.length>0) {
         let criteria = {
           email: req.body.email,
           password: MD5(MD5(req.body.password))
         };
         const checkPassword = await UserDAO.getUsers(criteria);
         if (checkPassword && checkPassword.length==1) {
-          res.status(200).json({message:'Logged in successfully!',result:checkPassword});
+          res.status(200).json({message:'Logged in successfully!',result:checkPassword[0],token:'dummy-jwt-token-for-now'});
         } else {
           res.status(401).json({message:'Incorrect password'});
         }
@@ -70,7 +70,12 @@ let login = async (req, res) => {
   }
 };
 
+let env = async (req, res) => {
+  res.status(200).json(config);
+}
+
 module.exports = {
   register: register,
-  login: login
+  login: login,
+  env: env
 }

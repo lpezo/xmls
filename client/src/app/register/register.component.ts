@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 import { UserService } from '../_services/user.service';
 @Component({
@@ -12,7 +13,8 @@ export class RegisterComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private toastr: ToastrService
   ) { }
   registerForm: FormGroup;
   loading = false;
@@ -43,8 +45,7 @@ export class RegisterComponent implements OnInit {
         this.router.navigate(['/login']);
      },
       (error)=>{
-        console.log(error,'error-----------');
-        alert(error.error.message);
+        this.toastr.error(error.error.message, 'Error');
         this.loading = false;
       }
     )

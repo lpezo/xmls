@@ -10,4 +10,6 @@ router.post("/register", authService.register);
 router.post("/login", authService.login);
 
 
+/* env */
+router.get("/env", authService.env);
 module.exports = router;

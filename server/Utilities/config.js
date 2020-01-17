@@ -1,16 +1,16 @@
-let environment = "dev";
+let environment = process.env.NODE_ENV || "dev";
 
 let serverURLs = {
     "dev": {
         "NODE_SERVER": "http://localhost",
         "NODE_SERVER_PORT": "3000",
-       // "MONGO_DB": "mongodb://localhost:27017/angular-login-register"
-       "MONGO_DB": "mongodb://deployment:kaur%40123@ds331145.mlab.com:31145/secondcars"
+        "MONGO_DB": "mongodb://localhost:27017/angular-login-register"
     },
     "production": {
-        "NODE_SERVER": "http://11.11.11.11",
-        "NODE_SERVER_PORT": "3000",
-        "MONGO_DB": "mongodb://localhost:27017/angular-login-register"
+        "NODE_SERVER": "http://localhost",
+        "NODE_SERVER_PORT": process.env.NODE_PORT,
+        "MONGO_DB": process.env.CUSTOMCONNSTR_MONGO_DB || "mongodb://localhost:27017/angular-login-register"
+
     }
 }
 
