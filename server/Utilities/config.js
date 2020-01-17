@@ -7,9 +7,9 @@ let serverURLs = {
         "MONGO_DB": "mongodb://localhost:27017/angular-login-register"
     },
     "production": {
-        "NODE_SERVER": "http://localhost",
-        "NODE_SERVER_PORT": process.env.NODE_PORT,
-        "MONGO_DB": process.env.CUSTOMCONNSTR_MONGO_DB || "mongodb://localhost:27017/angular-login-register"
+        "NODE_SERVER": process.env.HOST,
+        "NODE_SERVER_PORT": process.env.PORT,
+        "MONGO_DB": process.env.MONGO_URI || "mongodb://localhost:27017/angular-login-register"
 
     }
 }
