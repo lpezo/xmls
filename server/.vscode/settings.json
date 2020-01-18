@@ -1,3 +1,8 @@
 {
-    "appService.deploySubpath": ""
+    "appService.deploySubpath": "",
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/f6afa239-b7ab-4db8-8d38-8fb1075e96d6/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/pezorest"
 }
