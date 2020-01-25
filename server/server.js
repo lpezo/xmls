@@ -14,6 +14,7 @@ var User = require('./Models/User')
 const mongoose = require('./Utilities/mongooseConfig')();
 
 const authRoute = require('./Routes/auth');
+const proyectoRoute = require('./Routes/proyecto');
 const config = require("./Utilities/config").config;
 
 app.use(express.static(path.join(__dirname, '/dist/')));
@@ -33,6 +34,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use('/auth', authRoute);
+app.use('/proy', proyectoRoute);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
