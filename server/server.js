@@ -27,10 +27,20 @@ app.use(bodyParser.urlencoded({
 app.use(cors());
 
 app.use((err, req, res, next) => {
-  return res.send({
-    "statusCode": 401,
-    "statusMessage": "Something Went Wrong!"
-  });
+  if (!process.env.NODE_ENV || process.env.NODE_ENV == "dev")
+  {
+    console.log("dev: set access cors");
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
+  }
+  else
+    return res.send({
+      "statusCode": 401,
+      "statusMessage": "Something Went Wrong!"
+    });
 });
 
 app.use('/auth', authRoute);

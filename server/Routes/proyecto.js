@@ -11,6 +11,10 @@ router.delete('/del/:id', proyectoService.del);
 
 router.post('/list', proyectoService.list);
 
+router.post('/send', proyectoService.receive);
+
+router.post('/refresh/:id', proyectoService.refresh);
+
 /* env */
 router.get("/env", proyectoService.env);
 module.exports = router;

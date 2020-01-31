@@ -22,6 +22,10 @@ let User = new Schema({
     status: {
         type: String,
         default: 'ok'
+    },
+    total: {
+        type: Number,
+        default: 0
     }
 });
 
