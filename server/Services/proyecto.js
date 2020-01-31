@@ -1,6 +1,7 @@
 // const async = require("async");
 const config = require("../Utilities/config").config;
 const ProyectoDAO = require('../DAO/proyectoDAO');
+const fs = require('fs');
 
 /* API to register new proyecto */
 let add = async (req, res) => {
@@ -102,6 +103,39 @@ let list = async (req, res) => {
   }
 }
 
+let receive = async (req, res) => {
+  try {
+    SaveFile(req.body).then(data=>{
+      res.status(200).json({message: "ok"});
+    }).catch(error=>{
+      res.status(401).json(error);
+    })
+  } catch (error) {
+    res.status(403).json({message: "Error en send file", error:error});
+  }
+}
+
+const SaveFile = (data) => {
+  return new Promise((resolve, reject) => {
+    console.log('creando ', data.avatar.filename);
+    let path = './xmls';
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+    }
+    path = path + "/" + data.proyecto._id;
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+    }
+    path = path + '/' + data.avatar.filename;
+    let buff = new Buffer.from(data.avatar.value, 'base64');
+    fs.writeFile(path, buff, function(err){
+      if (err)
+        return reject(err);
+      resolve();
+    });
+  })
+}
+
 let env = async (req, res) => {
   res.status(200).json(config);
 }
@@ -111,5 +145,6 @@ module.exports = {
   upd: upd,
   env: env,
   del: del,
-  list: list
+  list: list,
+  receive: receive
 }

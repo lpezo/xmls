@@ -11,6 +11,8 @@ router.delete('/del/:id', proyectoService.del);
 
 router.post('/list', proyectoService.list);
 
+router.post('/send', proyectoService.receive);
+
 /* env */
 router.get("/env", proyectoService.env);
 module.exports = router;
