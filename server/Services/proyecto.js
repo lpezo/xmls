@@ -2,6 +2,7 @@
 const config = require("../Utilities/config").config;
 const ProyectoDAO = require('../DAO/proyectoDAO');
 const fs = require('fs');
+const path = require('path');
 
 /* API to register new proyecto */
 let add = async (req, res) => {
@@ -115,24 +116,65 @@ let receive = async (req, res) => {
   }
 }
 
+let refresh = async (req, res) => {
+  if (!req.params.id)
+    return res.status(401).json({message:'Falta id'});
+  try {
+    console.log('refresh: ', req.params.id);
+    let criteria = {_id: req.params.id};
+    let cant = await CountFiles(criteria).catch(error=>{
+      //return res.status(401).json(error);
+      console.log(error);
+      return;
+    });
+    const updProyecto = await ProyectoDAO.updateProyecto(criteria, {total:cant}, {});
+    // console
+    if (updProyecto) {
+      res.status(200).json(updProyecto);
+    } else {
+      res.status(403).json({message:"Something went wrong"});
+    }
+
+
+  } catch (error) {
+    res.status(403).json({message: "Error en refresh file"});
+  }
+}
+
+const getPath = (proyecto) => {
+  let dir = './xmls';
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+  dir = path.join(dir,  proyecto._id);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+  return dir;
+}
+
 const SaveFile = (data) => {
   return new Promise((resolve, reject) => {
     console.log('creando ', data.avatar.filename);
-    let path = './xmls';
-    if (!fs.existsSync(path)) {
-      fs.mkdirSync(path);
-    }
-    path = path + "/" + data.proyecto._id;
-    if (!fs.existsSync(path)) {
-      fs.mkdirSync(path);
-    }
-    path = path + '/' + data.avatar.filename;
+
+    let file = path.join(getPath(data.proyecto), data.avatar.filename);
     let buff = new Buffer.from(data.avatar.value, 'base64');
-    fs.writeFile(path, buff, function(err){
+    fs.writeFile(file, buff, function(err){
       if (err)
         return reject(err);
       resolve();
     });
+  })
+}
+
+const CountFiles = (proyecto) => {
+  return new Promise((resolve, reject) => {
+    let dir = getPath(proyecto);
+    fs.readdir(dir, function(err, files) {
+      if (err)
+        return reject(err);
+      resolve(files.length);
+    })
   })
 }
 
@@ -146,5 +188,6 @@ module.exports = {
   env: env,
   del: del,
   list: list,
-  receive: receive
-}
+  receive: receive,
+  refresh: refresh
+};
