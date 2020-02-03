@@ -141,6 +141,15 @@ let refresh = async (req, res) => {
   }
 }
 
+const proc = (req, res) => {
+  let id = req.params.id;
+  procesar(id).then(data=>{
+    res.status(200).json(data);
+  }).catch(error=>{
+    res.status(403).json({error:error.message});
+  })
+}
+
 const getPath = (proyecto) => {
   let dir = './xmls';
   if (!fs.existsSync(dir)) {
@@ -178,16 +187,30 @@ const CountFiles = (proyecto) => {
   })
 }
 
-let env = async (req, res) => {
-  res.status(200).json(config);
-}
+const procesar = async(id) => {
+  //let proy = await getProyectos(criteria);
+  let proy = await ProyectoDAO.findById(id);
+  if (proy){
+    if (proy.status != 'proc'){
+      proy = ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true}).catch(err=>{
+     //proy = updateProyecto(criteria, {status:'proc'}, {}).catch(err=>{
+       throw err;
+     });
+     return  proy;
+    }
+    else
+     throw new Error('Proyecto esta en Proceso');
+  }
+  else
+   throw new Error("Proyecto no encotrado")
+ }
 
 module.exports = {
   add: add,
   upd: upd,
-  env: env,
   del: del,
   list: list,
   receive: receive,
-  refresh: refresh
+  refresh: refresh,
+  proc: proc
 };

@@ -15,6 +15,6 @@ router.post('/send', proyectoService.receive);
 
 router.post('/refresh/:id', proyectoService.refresh);
 
-/* env */
-router.get("/env", proyectoService.env);
+router.post('/procesa/:id', proyectoService.proc);
+
 module.exports = router;
