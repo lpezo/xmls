@@ -192,11 +192,8 @@ const procesar = async(id) => {
   let proy = await ProyectoDAO.findById(id);
   if (proy){
     if (proy.status != 'proc'){
-      proy = ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true}).catch(err=>{
-     //proy = updateProyecto(criteria, {status:'proc'}, {}).catch(err=>{
-       throw err;
-     });
-     return  proy;
+      proy = ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
+      return proy;
     }
     else
      throw new Error('Proyecto esta en Proceso');

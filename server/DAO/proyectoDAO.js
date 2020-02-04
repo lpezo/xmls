@@ -3,12 +3,8 @@
 var Models = require("../Models/Proyecto");
 
 const findById = id => {
-  new Promise((resolve, reject) => {
     //let idobj = typeof(id) == 'string' ? mongoose.Types.ObjectId(id) : id;
-    Models.findById(id)
-      .then(client => resolve(client))
-      .catch(err => reject(err));
-  });
+    return Models.findById(id);
 }
 
 const getProyectos = criteria =>
@@ -37,13 +33,9 @@ const updateProyecto = (criteria, dataToSet, options) =>
       .catch(err => reject(err));
   });
 
-  const findByIdAndUpdate = (id, dataToSet, options) =>
-  new Promise((resolve, reject) => {
-   //let idobj = typeof(id) == 'string' ? mongoose.Types.ObjectId(id) : id;
-    Models.findOneAndUpdate(id, dataToSet, options)
-      .then(client => resolve(client))
-      .catch(err => reject(err));
-  });
+  const findByIdAndUpdate = (id, dataToSet, options) => {
+    return Models.findOneAndUpdate(id, dataToSet, options);
+  };
 
 const deleteProyecto = criteria =>
   new Promise((resolve, reject) => {
