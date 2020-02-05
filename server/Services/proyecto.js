@@ -1,11 +1,27 @@
 // const async = require("async");
 const optxml = require("../Utilities/config").optxml;
+const getDoc = require("../Utilities/xmlConfig").getDoc;
 const ProyectoDAO = require('../DAO/proyectoDAO');
 
 const fs = require('fs');
 const path = require('path');
 
 const parser = require('fast-xml-parser');
+
+let get = async(req, res) => {
+  let id = req.params.id;
+  try {
+    let data = await ProyectoDAO.findById(id);
+    if (data)
+      res.status(200).json(data);
+    else
+      res.status(401).json({message:'id no existe!'});
+  }
+  catch (error) {
+    res.status(403).json({message:"Something went wrong",error:error.message});
+  }
+  
+}
 
 /* API to register new proyecto */
 let add = async (req, res) => {
@@ -153,6 +169,17 @@ const proc = (req, res) => {
   })
 }
 
+const setok = async(req, res) => {
+  let id = req.params.id;
+  try {
+    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'ok'});
+    res.status(200).json(data);
+  }
+  catch (error) {
+    res.status(403).json({error:error.message});
+  }
+}
+
 const getPath = (proyecto) => {
   let dir = './xmls';
   if (!fs.existsSync(dir)) {
@@ -226,11 +253,13 @@ const procesar = async(id) => {
       proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
       try {
         let data = await ObtieneXmls(proy);
+        let doc = {};
         for (let file of data.files){
           let dataxml = await extraeDeXml(data.dir, file);
           fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
+          doc = getDoc(dataxml)
         }
-        return data;
+        return doc;
       }
       finally {
         proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ok'}, {new:true});
@@ -243,12 +272,9 @@ const procesar = async(id) => {
    throw new Error("Proyecto no encotrado")
  }
 
+
+
 module.exports = {
-  add: add,
-  upd: upd,
-  del: del,
-  list: list,
-  receive: receive,
-  refresh: refresh,
-  proc: proc
+  get, add, upd, del, list,
+  receive, refresh, proc, setok
 };

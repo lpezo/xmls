@@ -34,7 +34,9 @@ const updateProyecto = (criteria, dataToSet, options) =>
   });
 
   const findByIdAndUpdate = (id, dataToSet, options) => {
-    return Models.findOneAndUpdate(id, dataToSet, options);
+    if (!options)
+      options = {new:true};
+    return Models.findByIdAndUpdate(id, dataToSet, options);
   };
 
 const deleteProyecto = criteria =>

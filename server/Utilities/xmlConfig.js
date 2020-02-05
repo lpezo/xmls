@@ -13,6 +13,25 @@ let def =
         {"name": "igv", "path": "Invoice/cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
     ];
 
+const getDoc = (data) => {
+    let result = {};
+    for (let item of def){
+        let obj = data;
+        item.path.split('/').forEach(function(tag){
+            if (obj != null && obj.hasOwnProperty(tag))
+                obj = obj[tag];
+            else
+                obj = null;
+        });
+        if (obj.__cdata)
+            obj = obj.__cdata;
+        else if (obj["#text"])
+            obj = obj["#text"];
+        result[item.name] = obj;
+    }
+    return result;
+}
+
 module.exports = {
-    def
+    def, getDoc
 };
