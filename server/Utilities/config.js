@@ -1,5 +1,6 @@
 var env = require('dotenv').config();
 let environment = process.env.NODE_ENV || "dev";
+const he = require('he');
 
 let serverURLs = {
     "dev": {
@@ -33,6 +34,26 @@ let config = {
     }
 };
 
+var optxml = {
+    attributeNamePrefix : "@_",
+    attrNodeName: "attr", //default is 'false'
+    textNodeName : "#text",
+    ignoreAttributes : false,
+    ignoreNameSpace : false,
+    allowBooleanAttributes : false,
+    parseNodeValue : true,
+    parseAttributeValue : false,
+    trimValues: true,
+    cdataTagName: "__cdata", //default is 'false'
+    cdataPositionChar: "\\c",
+    parseTrueNumberOnly: false,
+    arrayMode: false, //"strict"
+    attrValueProcessor: (val, attrName) => he.decode(val, {isAttributeValue: true}),//default is a=>a
+    tagValueProcessor : (val, tagName) => he.decode(val), //default is a=>a
+    stopNodes: ["ext:UBLExtensions"]
+};
+
 module.exports = {
-    config: config
+    config: config,
+    optxml: optxml
 };

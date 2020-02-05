@@ -1,0 +1,229 @@
+###########################################################################
+# NUEVA PLATAFORMA - AMBIENTE DESARROLLO
+###########################################################################
+DBCON.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVDBCON)
+    )
+  )
+
+DBAPLIC2.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.100.175.105)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVDBAPLIC)
+    )
+  )
+
+GISDESA.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVGISPROD)
+    )
+  )
+
+SGCFAC.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVSGCFAC)
+    )
+  )
+
+ESTADISTICOS.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVDBPROD)
+    )
+  )
+
+DEVMAXIMO.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVMAXIMO)
+    )
+  )
+
+DEVDBSGI.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVDBSGI)
+    )
+  )
+
+DEVDBPRU.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVDBPRU)
+    )
+  )
+
+DEV.WORLD =
+ (DESCRIPTION =
+   (ADDRESS_LIST =
+     (ADDRESS = (PROTOCOL = TCP)(HOST = 10.100.175.113)(PORT = 27915))
+   )
+   (CONNECT_DATA =
+     (SERVER = DEDICATED)
+     (SERVICE_NAME  = DEV)
+   )
+ ) 
+
+DEVTIVOLI.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEVTIVOLI)
+    )
+  )
+  
+  
+DEDWSEDA.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = sdp-datamartdes1.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = DEDWSEDA)
+    )
+  )
+
+  
+###########################################################################
+# NUEVA PLATAFORMA - AMBIENTE QAS
+###########################################################################
+
+OPENQA.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = QASOPENQA)
+    )
+  )
+
+OPENQA2.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = QASOPENQA2)
+    )
+  )
+
+QASTIVOLI.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scandesa.sedapal.com.pe)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = QASTIVOLI)
+    )
+  )
+
+QAS.WORLD =
+ (DESCRIPTION =
+   (ADDRESS_LIST =
+     (ADDRESS = (PROTOCOL = TCP)(HOST = 10.100.175.111)(PORT = 27915))
+   )
+   (CONNECT_DATA =
+     (SERVER = DEDICATED)
+     (SERVICE_NAME  = QAS)
+   )
+ ) 
+
+# ##########################################
+# # NUEVA PLATAFORMA - BASES DE DATOS DE PRODUCCION - ORACLE 12.2c
+# ##########################################  
+
+DBAPLIC.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scanprod.sedapal.com.pe)(PORT = 3036))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = PRDDBAPLIC)
+    )
+  )
+  
+DBPROD.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scanprod.sedapal.com.pe)(PORT = 3036))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = PRDDBPROD)
+    )
+  )  
+
+GISPROD.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scanprod.sedapal.com.pe)(PORT = 3036))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = PRDGISPROD)
+    )
+  )  
+
+PRDDBPRU.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scanprod.sedapal.com.pe)(PORT = 3036))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = PRDDBPRU)
+    )
+  )  
+
+PRDDBSGI.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scanprod.sedapal.com.pe)(PORT = 3036))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = PRDDBSGI)
+    )
+  )  
+
+PRDMAXIMO.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scanprod.sedapal.com.pe)(PORT = 3036))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = PRDMAXIMO)
+    )
+  )  
+
+PRDTIVOLI.WORLD =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scanprod.sedapal.com.pe)(PORT = 3036))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = PRDTIVOLI)
+    )
+  )  
+
+PRD.WORLD=
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+        (ADDRESS =
+          (PROTOCOL = TCP)
+          (HOST = sdp-sdpsapprd.sedapal.com.pe)
+          (PORT = 27915)
+        )
+    )
+    (CONNECT_DATA =
+       (SID = PRD)
+       (GLOBAL_NAME = PRD.WORLD)
+    )
+  )

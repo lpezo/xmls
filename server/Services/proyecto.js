@@ -1,8 +1,11 @@
 // const async = require("async");
-const config = require("../Utilities/config").config;
+const optxml = require("../Utilities/config").optxml;
 const ProyectoDAO = require('../DAO/proyectoDAO');
+
 const fs = require('fs');
 const path = require('path');
+
+const parser = require('fast-xml-parser');
 
 /* API to register new proyecto */
 let add = async (req, res) => {
@@ -155,7 +158,7 @@ const getPath = (proyecto) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
-  dir = path.join(dir,  proyecto._id);
+  dir = path.join(dir,  proyecto._id.toString());
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
@@ -179,10 +182,38 @@ const SaveFile = (data) => {
 const CountFiles = (proyecto) => {
   return new Promise((resolve, reject) => {
     let dir = getPath(proyecto);
+    ObtieneXmls(proyecto)
+    .then(files=>resolve(files.length))
+    .catch(err=>reject(err));
+  })
+}
+
+const ObtieneXmls = (proyecto) => {
+  return new Promise((resolve, reject) => {
+    let dir = getPath(proyecto);
     fs.readdir(dir, function(err, files) {
       if (err)
         return reject(err);
-      resolve(files.length);
+      var files = files.filter(function(file){
+        return path.extname(file).toLowerCase() === '.xml';
+      });
+      resolve({dir, files});
+    })
+  })
+}
+
+const extraeDeXml = (dir, file) => {
+  return new Promise((resolve, reject)=>{
+    let ruta = path.join(dir, file);
+    fs.readFile(ruta, "ascii", function (err, data) {
+      if (err)
+          return reject(err);
+      try{
+        var jsonObj = parser.parse(data,optxml, true);
+        resolve(jsonObj);
+      }catch(error){
+        reject(error);
+      }
     })
   })
 }
@@ -192,8 +223,18 @@ const procesar = async(id) => {
   let proy = await ProyectoDAO.findById(id);
   if (proy){
     if (proy.status != 'proc'){
-      proy = ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
-      return proy;
+      proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
+      try {
+        let data = await ObtieneXmls(proy);
+        for (let file of data.files){
+          let dataxml = await extraeDeXml(data.dir, file);
+          fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
+        }
+        return data;
+      }
+      finally {
+        proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ok'}, {new:true});
+      }
     }
     else
      throw new Error('Proyecto esta en Proceso');
