@@ -1,6 +1,7 @@
 "use strict";
 
-var Models = require("../Models/Proyecto");
+var Models = require("../Models/Xml");
+var mongoose = require('mongoose');
 
 const findById = id => {
     return Models.findById(id);
@@ -27,9 +28,18 @@ const createXml = objToSave =>
       });
   });
 
+  const saveXml = (idproy, iduser, name, doc) => {
+      let criteria = {
+        user: typeof(iduser) == 'string' ? mongoose.Types.ObjectId(iduser) : iduser,
+        proy: idproy
+      };
+      return Models.findOneAndUpdate(criteria, {name: name, doc: doc}, {new:true, upsert: true});
+  };
+
   module.exports = {
     findById,
     findByIdAndUpdate,
     getXmls,
-    createXml
+    createXml,
+    saveXml
   };

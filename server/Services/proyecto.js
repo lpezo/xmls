@@ -2,6 +2,7 @@
 const optxml = require("../Utilities/config").optxml;
 const getDoc = require("../Utilities/xmlConfig").getDoc;
 const ProyectoDAO = require('../DAO/proyectoDAO');
+const XmlDao = require('../DAO/xmlDAO');
 
 const fs = require('fs');
 const path = require('path');
@@ -256,10 +257,12 @@ const procesar = async(id) => {
         let doc = {};
         for (let file of data.files){
           let dataxml = await extraeDeXml(data.dir, file);
-          fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
-          doc = getDoc(dataxml)
+          //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
+          doc = getDoc(dataxml);
+          let name = path.parse(file).name;
+          await XmlDao.saveXml(proy._id, proy.user, name, doc);
         }
-        return doc;
+        return data.files;
       }
       finally {
         proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ok'}, {new:true});

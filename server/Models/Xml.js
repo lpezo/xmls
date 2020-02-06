@@ -15,6 +15,9 @@ let Xml = new Schema({
         default: null,
         required: true
     },
+    doc: {
+        type: Schema.Types.Mixed
+    },
     created: {
         type: Date,
         default: Date.now()
@@ -25,4 +28,5 @@ let Xml = new Schema({
     }
 });
 
+Xml.index({proy:1, name:1}, {unique:1});
 module.exports = mongoose.model('Xml', Xml);
