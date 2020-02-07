@@ -37,15 +37,27 @@ const createXml = objToSave =>
         Models.findOneAndUpdate(criteria, {name: name, doc: doc}, {new:true, upsert: true}, (err, res)=>{
           if (err)
             return reject(err);
+          //return reject(new Error(name));
           resolve(res);
         })
       })
   };
+
+  const deleteProy = (idproy) => {
+    return new Promise((resolve, reject) => {
+      Models.remove({proy: idproy}, (err, result)=>{
+        if (err)
+          return reject(err);
+        resolve(result);
+      })
+    })
+  }
 
   module.exports = {
     findById,
     findByIdAndUpdate,
     getXmls,
     createXml,
-    saveXml
+    saveXml,
+    deleteProy
   };

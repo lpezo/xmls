@@ -215,10 +215,9 @@ const ensureDirBak = (proyecto) => {
 const mueve = (dir, dirbak, file) => {
   let rutafile = path.join(dir, file);
   let rutafilebak = path.join(dirbak, file);
-  if (fs.existsSync(rutafilebak)){
+  if (fs.existsSync(rutafilebak))
     fs.unlinkSync(rutafilebak);
-  fs.mov
-  }
+  fs.renameSync(rutafile, rutafilebak);
 }
 
 const SaveFile = (data) => {
@@ -274,6 +273,15 @@ const extraeDeXml = (dir, file) => {
   })
 }
 
+const deletexmls = (req, res) => {
+  let id = req.params.id;
+  XmlDao.deleteProy(id).then(data=>{
+    res.status(200).json(data);
+  }).catch(error=>{
+    res.status(401).json(error);
+  })
+}
+
 const procesar = async(id) => {
   //let proy = await getProyectos(criteria);
   let proy = await ProyectoDAO.findById(id);
@@ -285,13 +293,21 @@ const procesar = async(id) => {
         let data = await ObtieneXmls(proy);
         let doc = {};
         for (let file of data.files){
+          console.log(`[proy $(proy._id)] file:`, file);
           let dataxml = await extraeDeXml(data.dir, file);
           //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           doc = getDoc(dataxml);
           let name = path.parse(file).name;
-          await XmlDao.saveXml(proy._id, proy.user, name, doc).then(res=>{
+          try{
+            let saved = await XmlDao.saveXml(proy._id, proy.user, name, doc);
+          //.then(res=>{
+            //console.log('saved:', saved);
             mueve(data.dir, dirbak, file);
-          });
+          }
+          catch (err) {
+            console.log('err:', err.message);
+          }
+          //});
         }
         if (data.files.length == 0)
           proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ver'}, {new:true});
@@ -309,5 +325,6 @@ const procesar = async(id) => {
 module.exports = {
   get, add, upd, del, list,
   receive, refresh, proc, 
-  setok, setproc
+  setok, setproc,
+  deletexmls
 };
