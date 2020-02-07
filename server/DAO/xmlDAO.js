@@ -29,11 +29,17 @@ const createXml = objToSave =>
   });
 
   const saveXml = (idproy, iduser, name, doc) => {
-      let criteria = {
-        user: typeof(iduser) == 'string' ? mongoose.Types.ObjectId(iduser) : iduser,
-        proy: idproy
-      };
-      return Models.findOneAndUpdate(criteria, {name: name, doc: doc}, {new:true, upsert: true});
+      return new Promise((resolve, reject) => {
+        let criteria = {
+          user: typeof(iduser) == 'string' ? mongoose.Types.ObjectId(iduser) : iduser,
+          proy: idproy
+        };
+        Models.findOneAndUpdate(criteria, {name: name, doc: doc}, {new:true, upsert: true}, (err, res)=>{
+          if (err)
+            return reject(err);
+          resolve(res);
+        })
+      })
   };
 
   module.exports = {

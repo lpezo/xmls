@@ -20,5 +20,6 @@ router.post('/refresh/:id', proyectoService.refresh);
 router.post('/procesa/:id', proyectoService.proc);
 
 router.put('/setok/:id', proyectoService.setok);
+router.put('/setproc/:id', proyectoService.setproc);
 
 module.exports = router;

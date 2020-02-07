@@ -181,6 +181,17 @@ const setok = async(req, res) => {
   }
 }
 
+const setproc = async(req, res) => {
+  let id = req.params.id;
+  try {
+    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'});
+    res.status(200).json(data);
+  }
+  catch (error) {
+    res.status(403).json({error:error.message});
+  }
+}
+
 const getPath = (proyecto) => {
   let dir = './xmls';
   if (!fs.existsSync(dir)) {
@@ -191,6 +202,23 @@ const getPath = (proyecto) => {
     fs.mkdirSync(dir);
   }
   return dir;
+}
+
+const ensureDirBak = (proyecto) => {
+  let dir = getPath(proyecto);
+  let dirbak = path.join(dir, "bak");
+  if (!fs.existsSync(dirbak))
+    fs.mkdirSync(dirbak);
+  return dirbak;
+}
+
+const mueve = (dir, dirbak, file) => {
+  let rutafile = path.join(dir, file);
+  let rutafilebak = path.join(dirbak, file);
+  if (fs.existsSync(rutafilebak)){
+    fs.unlinkSync(rutafilebak);
+  fs.mov
+  }
 }
 
 const SaveFile = (data) => {
@@ -250,9 +278,10 @@ const procesar = async(id) => {
   //let proy = await getProyectos(criteria);
   let proy = await ProyectoDAO.findById(id);
   if (proy){
-    if (proy.status != 'proc'){
-      proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
-      try {
+    if (proy.status == 'proc'){
+      //proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
+
+        let dirbak = ensureDirBak(proy);
         let data = await ObtieneXmls(proy);
         let doc = {};
         for (let file of data.files){
@@ -260,16 +289,16 @@ const procesar = async(id) => {
           //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           doc = getDoc(dataxml);
           let name = path.parse(file).name;
-          await XmlDao.saveXml(proy._id, proy.user, name, doc);
+          await XmlDao.saveXml(proy._id, proy.user, name, doc).then(res=>{
+            mueve(data.dir, dirbak, file);
+          });
         }
+        if (data.files.length == 0)
+          proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ver'}, {new:true});
         return data.files;
-      }
-      finally {
-        proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ok'}, {new:true});
-      }
     }
     else
-     throw new Error('Proyecto esta en Proceso');
+     throw new Error('Proyecto no esta en Proceso');
   }
   else
    throw new Error("Proyecto no encotrado")
@@ -279,5 +308,6 @@ const procesar = async(id) => {
 
 module.exports = {
   get, add, upd, del, list,
-  receive, refresh, proc, setok
+  receive, refresh, proc, 
+  setok, setproc
 };
