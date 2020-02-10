@@ -192,6 +192,17 @@ const setproc = async(req, res) => {
   }
 }
 
+const deleteAll = (req, res) => {
+  let id = req.params.id;
+  XmlDao.deleteFor({proy: id}).then(data=>{
+    res.status(200).json(data);
+  }).catch(err=>{
+    res.status(403).json({error:error.message});
+  })
+  
+}
+
+
 const getPath = (proyecto) => {
   let dir = './xmls';
   if (!fs.existsSync(dir)) {
@@ -215,10 +226,9 @@ const ensureDirBak = (proyecto) => {
 const mueve = (dir, dirbak, file) => {
   let rutafile = path.join(dir, file);
   let rutafilebak = path.join(dirbak, file);
-  if (fs.existsSync(rutafilebak)){
-    fs.unlinkSync(rutafilebak);
-  fs.mov
-  }
+  if (fs.existsSync(rutafilebak))
+    fs.unlinkSync(rutafile);
+  fs.renameSync(rutafile, rutafilebak);
 }
 
 const SaveFile = (data) => {
@@ -274,24 +284,30 @@ const extraeDeXml = (dir, file) => {
   })
 }
 
+
 const procesar = async(id) => {
   //let proy = await getProyectos(criteria);
   let proy = await ProyectoDAO.findById(id);
   if (proy){
     if (proy.status == 'proc'){
       //proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
-
         let dirbak = ensureDirBak(proy);
         let data = await ObtieneXmls(proy);
         let doc = {};
         for (let file of data.files){
+          console.log('file:', file);
           let dataxml = await extraeDeXml(data.dir, file);
           //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           doc = getDoc(dataxml);
           let name = path.parse(file).name;
-          await XmlDao.saveXml(proy._id, proy.user, name, doc).then(res=>{
-            mueve(data.dir, dirbak, file);
-          });
+          try {
+            await XmlDao.saveXml(proy._id, proy.user, name, doc);
+              mueve(data.dir, dirbak, file);
+          }
+          catch (error) {
+            console.log(error.message);
+          }
+          
         }
         if (data.files.length == 0)
           proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ver'}, {new:true});
@@ -309,5 +325,6 @@ const procesar = async(id) => {
 module.exports = {
   get, add, upd, del, list,
   receive, refresh, proc, 
-  setok, setproc
+  setok, setproc,
+  deleteAll
 };

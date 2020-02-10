@@ -30,22 +30,34 @@ const createXml = objToSave =>
 
   const saveXml = (idproy, iduser, name, doc) => {
       return new Promise((resolve, reject) => {
+        let user = typeof(iduser) == 'string' ? mongoose.Types.ObjectId(iduser) : iduser;
         let criteria = {
-          user: typeof(iduser) == 'string' ? mongoose.Types.ObjectId(iduser) : iduser,
-          proy: idproy
+          proy: idproy,
+          name: name
         };
-        Models.findOneAndUpdate(criteria, {name: name, doc: doc}, {new:true, upsert: true}, (err, res)=>{
+        Models.findOneAndUpdate(criteria, {user: user, doc: doc}, {new:true, upsert: true}, function(err, data, res) {
           if (err)
             return reject(err);
-          resolve(res);
+          resolve(data);
         })
       })
   };
+
+  const deleteFor = (criteria) => {
+    return new Promise((resolve, reject) => {
+      Models.deleteMany(criteria, (err, result)=> {
+        if (err)
+          return reject(err);
+          resolve (res);
+      })
+    })
+  }
 
   module.exports = {
     findById,
     findByIdAndUpdate,
     getXmls,
     createXml,
-    saveXml
+    saveXml,
+    deleteFor
   };

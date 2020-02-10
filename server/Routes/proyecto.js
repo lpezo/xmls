@@ -22,4 +22,7 @@ router.post('/procesa/:id', proyectoService.proc);
 router.put('/setok/:id', proyectoService.setok);
 router.put('/setproc/:id', proyectoService.setproc);
 
+router.delete('/deletexml/:id', proyectoService.deleteAll);
+
+
 module.exports = router;
