@@ -1,8 +1,8 @@
-// const async = require("async");
 const optxml = require("../Utilities/config").optxml;
 const getDoc = require("../Utilities/xmlConfig").getDoc;
 const ProyectoDAO = require('../DAO/proyectoDAO');
 const XmlDao = require('../DAO/xmlDAO');
+const Sunat = require('../Utilities/sunat');
 
 const fs = require('fs');
 const path = require('path');
@@ -192,6 +192,17 @@ const setproc = async(req, res) => {
   }
 }
 
+const deleteAll = (req, res) => {
+  let id = req.params.id;
+  XmlDao.deleteFor({proy: id}).then(data=>{
+    res.status(200).json(data);
+  }).catch(err=>{
+    res.status(403).json({error:error.message});
+  })
+  
+}
+
+
 const getPath = (proyecto) => {
   let dir = './xmls';
   if (!fs.existsSync(dir)) {
@@ -216,7 +227,7 @@ const mueve = (dir, dirbak, file) => {
   let rutafile = path.join(dir, file);
   let rutafilebak = path.join(dirbak, file);
   if (fs.existsSync(rutafilebak))
-    fs.unlinkSync(rutafilebak);
+    fs.unlinkSync(rutafile);
   fs.renameSync(rutafile, rutafilebak);
 }
 
@@ -252,7 +263,14 @@ const ObtieneXmls = (proyecto) => {
       var files = files.filter(function(file){
         return path.extname(file).toLowerCase() === '.xml';
       });
-      resolve({dir, files});
+      if (files.length > 20){
+        let filesminus = [];
+        for (let i = 0; i < 20; i++)
+          filesminus.push(files[i]);
+        resolve({dir, filesminus});
+      }
+      else
+        resolve({dir, files});
     })
   })
 }
@@ -273,14 +291,6 @@ const extraeDeXml = (dir, file) => {
   })
 }
 
-const deletexmls = (req, res) => {
-  let id = req.params.id;
-  XmlDao.deleteProy(id).then(data=>{
-    res.status(200).json(data);
-  }).catch(error=>{
-    res.status(401).json(error);
-  })
-}
 
 const procesar = async(id) => {
   //let proy = await getProyectos(criteria);
@@ -288,30 +298,60 @@ const procesar = async(id) => {
   if (proy){
     if (proy.status == 'proc'){
       //proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
-
         let dirbak = ensureDirBak(proy);
         let data = await ObtieneXmls(proy);
         let doc = {};
         for (let file of data.files){
-          console.log(`[proy $(proy._id)] file:`, file);
+          console.log('file:', file);
           let dataxml = await extraeDeXml(data.dir, file);
           //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           doc = getDoc(dataxml);
           let name = path.parse(file).name;
-          try{
-            let saved = await XmlDao.saveXml(proy._id, proy.user, name, doc);
-          //.then(res=>{
-            //console.log('saved:', saved);
-            mueve(data.dir, dirbak, file);
+          try {
+            await XmlDao.saveXml(proy._id, proy.user, name, doc);
+              mueve(data.dir, dirbak, file);
           }
-          catch (err) {
-            console.log('err:', err.message);
+          catch (error) {
+            console.log(error.message);
           }
-          //});
+          
         }
         if (data.files.length == 0)
           proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ver'}, {new:true});
         return data.files;
+    }
+    else if (proy.status == 'ver') {
+      try {
+        let listaver = await XmlDao.getForVerification(id);
+        let ares = [];
+        if (listaver){
+          
+          let otoken = await Sunat.getToken();
+          let token = otoken.access_token;
+
+          for (let cadaxml of listaver){
+            console.log('verificando ', cadaxml.proy, cadaxml.name);
+            let cod = cadaxml.name.split('-')[1];
+            let anum = cadaxml.doc.num.split('-');
+            let afecha = cadaxml.doc.fecha.split('-');
+            let docum = {
+              numRuc: cadaxml.doc.ruc,
+              codComp: cod,
+              numeroSerie: anum[0],
+              numero: anum[1],
+              fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
+              monto: cadaxml.doc.total
+            };
+            let res = await Sunat.getResponse(docum, token);
+            await XmlDao.SetVerification(cadaxml, res);
+            ares.push(res);
+          }
+        }
+        return ares;
+      } catch(err) {
+        console.log('Error getForVerification: ', err.message);
+      }
+
     }
     else
      throw new Error('Proyecto no esta en Proceso');
@@ -326,5 +366,5 @@ module.exports = {
   get, add, upd, del, list,
   receive, refresh, proc, 
   setok, setproc,
-  deletexmls
+  deleteAll
 };

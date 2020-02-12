@@ -1,20 +1,28 @@
+let root = ["Invoice", "CreditNote"];
+
 let def = 
     [
-        {"name": "num", "path": "Invoice/cbc:ID", "desc": "Número de Documento"},
-        {"name": "fecha", "path": "Invoice/cbc:IssueDate", "desc": "Fecha de Documento"},
-        {"name": "hora", "path": "Invoice/cbc:IssueTime", "desc": "Hora de Documento"},
+        {"name": "num", "path": "cbc:ID", "desc": "Número de Documento"},
+        {"name": "fecha", "path": "cbc:IssueDate", "desc": "Fecha de Documento"},
+        {"name": "hora", "path": "cbc:IssueTime", "desc": "Hora de Documento"},
 
-        {"name": "ruc", "path": "Invoice/cac:Signature/cac:SignatoryParty/cac:PartyIdentification/cbc:ID", "desc": "Ruc"},
-        {"name": "razon", "path": "Invoice/cac:Signature/cac:SignatoryParty/cac:PartyName/cbc:Name", "desc": "Nombre Empresa"},
-        {"name": "ref", "path": "Invoice/cac:Signature/cac:DigitalSignatureAttachment/cac:ExternalReference/cbc:URI", "desc": "Número Referencia"},
+        {"name": "ruc", "path": "cac:Signature/cac:SignatoryParty/cac:PartyIdentification/cbc:ID", "desc": "Ruc"},
+        {"name": "razon", "path": "cac:Signature/cac:SignatoryParty/cac:PartyName/cbc:Name", "desc": "Nombre Empresa"},
+        {"name": "ref", "path": "cac:Signature/cac:DigitalSignatureAttachment/cac:ExternalReference/cbc:URI", "desc": "Número Referencia"},
 
-        {"name": "total", "path": "Invoice/cac:LegalMonetaryTotal/cbc:PayableAmount", "desc": "Total"},
-        {"name": "subtotal", "path": "Invoice/cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount", "desc": "Sub Total"},
-        {"name": "igv", "path": "Invoice/cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
+        {"name": "total", "path": "cac:LegalMonetaryTotal/cbc:PayableAmount", "desc": "Total"},
+        {"name": "subtotal", "path": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount", "desc": "Sub Total"},
+        {"name": "igv", "path": "cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
     ];
 
 const getDoc = (data) => {
     let result = {};
+    for (let cadaroot of root){
+        if (data.hasOwnProperty(cadaroot)){
+            data = data[cadaroot];
+            break;
+        }
+    }
     for (let item of def){
         let obj = data;
         item.path.split('/').forEach(function(tag){
@@ -23,10 +31,12 @@ const getDoc = (data) => {
             else
                 obj = null;
         });
-        if (obj.__cdata)
-            obj = obj.__cdata;
-        else if (obj["#text"])
-            obj = obj["#text"];
+        if (obj != null){
+            if (obj.__cdata)
+                obj = obj.__cdata;
+            else if (obj["#text"])
+                obj = obj["#text"];
+        }
         result[item.name] = obj;
     }
     return result;

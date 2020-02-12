@@ -34,11 +34,28 @@ const updateProyecto = (criteria, dataToSet, options) =>
   });
 
   const findByIdAndUpdate = (id, dataToSet, options) => {
-    if (!options)
-      options = {new:true};
-    return Models.findByIdAndUpdate(id, dataToSet, options);
-  };
+    return new Promise((resolve, reject) => {
+      if (!options)
+        options = {new:true};
+      Models.findByIdAndUpdate(id, dataToSet, options, (err, res) => {
+        if (err)
+          return reject(err);
+        resolve(res);
+      });
+    })
 
+  };
+  /*
+  const find = (criteria) => {
+    return new Promise((resolve, reject) => {
+      Models.find(criteria, (err, res)=> {
+        if (err)
+          return reject(err);
+        resolve(res);
+      })
+    });
+  }
+  */
 const deleteProyecto = criteria =>
   new Promise((resolve, reject) => {
     Models.findOneAndRemove(criteria)

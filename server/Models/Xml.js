@@ -25,6 +25,18 @@ let Xml = new Schema({
     status: {
         type: String,
         default: 'ok'
+    },
+    success: {
+        type: Boolean,
+        defaul: false
+    },
+    message: {
+        type: String,
+        default: ""
+    },
+    errorCode: {
+        type: String,
+        default: "00"
     }
 });
 
