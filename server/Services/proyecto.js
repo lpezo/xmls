@@ -8,6 +8,8 @@ const fs = require('fs');
 const path = require('path');
 
 const parser = require('fast-xml-parser');
+const xlsx = require('node-xlsx');
+const zip = require('express-zip');
 
 let get = async(req, res) => {
   let id = req.params.id;
@@ -184,7 +186,7 @@ const setok = async(req, res) => {
 const setproc = async(req, res) => {
   let id = req.params.id;
   try {
-    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'});
+    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc', excel:''});
     res.status(200).json(data);
   }
   catch (error) {
@@ -202,6 +204,26 @@ const deleteAll = (req, res) => {
   
 }
 
+const downloadExcel = (req, res) => {
+  let id = req.params.id;
+  try {
+    ProyectoDAO.findById(id).then(data=>{
+      if (data.excel){
+        let dir = path.join("xmls", id);
+        let filename = path.join(dir, data.excel);
+        //res.download(filename);
+        res.zip([
+          {path: filename, name: data.excel}
+        ])
+      }
+      else
+        res.status(403).json({error:"campo excel vacio"});
+    })
+  }
+  catch (error) {
+    res.status(403).json({error:error.message});
+  }
+}
 
 const getPath = (proyecto) => {
   let dir = './xmls';
@@ -343,8 +365,15 @@ const procesar = async(id) => {
               monto: cadaxml.doc.total
             };
             let res = await Sunat.getResponse(docum, token);
-            await XmlDao.SetVerification(cadaxml, res);
+            await XmlDao.SetVerification(cadaxml._id, res);
             ares.push(res);
+          }
+          if (listaver.length == 0){
+            let fileexcel = await GeneraExcel(proy);
+            
+            console.log('Excel generado: ', fileexcel);
+            proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'fin', excel: fileexcel.name});
+            return proy;
           }
         }
         return ares;
@@ -360,11 +389,45 @@ const procesar = async(id) => {
    throw new Error("Proyecto no encotrado")
  }
 
+const GeneraExcel = async(proy) => {
+  return new Promise( (resolve, reject) => {
+    try {
+      XmlDao.getForSend(proy._id, (err, lista) => {
 
+        if (err)
+          return reject(err);
+
+        let dataxls = [
+          ["tipodoc", "numero", "ruc", "razon", "total", "success", "message"]
+        ];
+
+        for (let item of lista){
+          dataxls.push( [item.tipodoc, item.doc.num, item.doc.ruc, item.doc.razon, item.doc.total, item.success, item.message] );
+        }
+
+        const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);
+
+        let dir = path.join("xmls", proy._id.toString());
+        let name = "respuesta.xlsx";
+        let filename = path.join(dir, name);
+        console.log('grabando excel en ', filename);
+
+        fs.writeFile (filename, buffer, (err) => {
+          if (err)
+            return reject(err);
+          resolve({filename,name});
+        })
+      })
+
+    } catch(err) {
+      reject(err);
+    }
+  })
+}
 
 module.exports = {
   get, add, upd, del, list,
   receive, refresh, proc, 
   setok, setproc,
-  deleteAll
+  deleteAll, downloadExcel
 };

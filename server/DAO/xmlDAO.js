@@ -28,11 +28,17 @@ const getForVerification = idproy => {
   })
 }
 
+const getForSend = (idproy, cb) => {
+    Models.find({proy: idproy}, {name:1, doc:1, status:1, message:1, success:1, data:1})
+    .sort({tipodoc:1, "doc.num":1})
+    .exec(cb);
+}
+
 const SetVerification = (id, verification) => {
   return new Promise((resolve, reject) => {
     let setdata = verification;
     setdata.status = "ver";
-    Models.findOneAndUpdate(id, setdata, (err, res )=>{
+    Models.findByIdAndUpdate(id, setdata, (err, res )=>{
       if (err)
         return reject(err);
       resolve(res);
@@ -57,7 +63,9 @@ const createXml = objToSave =>
           proy: idproy,
           name: name
         };
-        Models.findOneAndUpdate(criteria, {user: user, doc: doc}, 
+        let aname = name.split('-');
+        let tipodoc = aname.length > 1 ? aname[1] : '';
+        Models.findOneAndUpdate(criteria, {user: user, tipodoc: tipodoc, doc: doc}, 
           {new:true, upsert: true, setDefaultsOnInsert: true}, function(err, data, res) {
           if (err)
             return reject(err);
@@ -83,5 +91,6 @@ const createXml = objToSave =>
     saveXml,
     deleteFor,
     getForVerification,
-    SetVerification
+    SetVerification,
+    getForSend
   };

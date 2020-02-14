@@ -24,5 +24,6 @@ router.put('/setproc/:id', proyectoService.setproc);
 
 router.delete('/deletexml/:id', proyectoService.deleteAll);
 
+router.get('/excel/:id', proyectoService.downloadExcel);
 
 module.exports = router;

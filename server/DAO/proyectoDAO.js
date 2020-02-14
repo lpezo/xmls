@@ -37,6 +37,7 @@ const updateProyecto = (criteria, dataToSet, options) =>
     return new Promise((resolve, reject) => {
       if (!options)
         options = {new:true};
+      dataToSet.modified = Date.now();
       Models.findByIdAndUpdate(id, dataToSet, options, (err, res) => {
         if (err)
           return reject(err);

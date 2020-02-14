@@ -15,6 +15,9 @@ let Xml = new Schema({
         default: null,
         required: true
     },
+    tipodoc: {
+        type: String
+    },
     doc: {
         type: Schema.Types.Mixed
     },
@@ -37,6 +40,9 @@ let Xml = new Schema({
     errorCode: {
         type: String,
         default: "00"
+    },
+    data: {
+        type: Schema.Types.Mixed
     }
 });
 

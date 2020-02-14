@@ -19,6 +19,9 @@ let User = new Schema({
         type: Date,
         default: Date.now()
     },
+    modified: {
+        type: Date
+    },
     status: {
         type: String,
         default: 'ok'
@@ -26,6 +29,9 @@ let User = new Schema({
     total: {
         type: Number,
         default: 0
+    },
+    excel: {
+        type: String
     }
 });
 
