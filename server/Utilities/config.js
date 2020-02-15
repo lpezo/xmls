@@ -31,7 +31,8 @@ let config = {
     },
     "NODE_SERVER_URL": {
         "url": `${serverURLs[environment].NODE_SERVER}`
-    }
+    },
+    "NODE_SERVER": `${serverURLs[environment].NODE_SERVER}:${serverURLs[environment].NODE_SERVER_PORT}`
 };
 
 var optxml = {

@@ -1,5 +1,5 @@
 var Request = require("request");
-var sunat = require("./Utilities/sunat");
+var {config} = require("./Utilities/config");
 //var https = require("https");
 //var querystring = require("querystring");
 var elapse = 30000; //30 seg
@@ -34,7 +34,7 @@ let ejecutar = () => {
     return new Promise((resolve, reject) => {
         Request.post({
             "headers": { "content-type": "application/json" },
-            "url": "http://localhost:3000/proy/list",
+            "url": config.NODE_SERVER + "/proy/list",
             "body": JSON.stringify({
                 "status": {$in: ["proc", "ver"]}
             })
@@ -65,7 +65,7 @@ let procesa = (index, ids) => {
             console.log('Procesando ', id);
             Request.post({
                 "headers": { "content-type": "application/json" },
-                "url": "http://localhost:3000/proy/procesa/" + id.toString()
+                "url": config.NODE_SERVER + "/proy/procesa/" + id.toString()
             }, (error, response, body) => {
                 console.log('response ', index, body);
                 procesa(index+1, ids).then(()=>{
