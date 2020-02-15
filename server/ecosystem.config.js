@@ -12,5 +12,16 @@ module.exports = {
       NODE_ENV: "production",
       PORT:9000
     }
-  }]
+  },
+  {
+    name: "daemon",
+    script: "/home/pezo/xmls/server/daemon.js",
+    path: "/home/pezo/xmls/server",
+    watch: true,
+    env: {
+    },
+    env_production: {
+    }
+  }
+]
 }
