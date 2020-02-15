@@ -322,12 +322,15 @@ const procesar = async(id) => {
         for (let file of data.files){
           console.log('file:', file);
           let dataxml = await extraeDeXml(data.dir, file);
-          //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
+          fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           doc = getDoc(dataxml);
           let name = path.parse(file).name;
           try {
-            await XmlDao.saveXml(proy._id, proy.user, name, doc);
-              mueve(data.dir, dirbak, file);
+            if (doc.num)
+              await XmlDao.saveXml(proy._id, proy.user, name, doc, {});
+            else
+              await XmlDao.saveXml(proy._id, proy.user, name, doc, {status:error, message:'Error en leer xml'});
+            mueve(data.dir, dirbak, file);
           }
           catch (error) {
             console.log(error.message);
@@ -348,21 +351,25 @@ const procesar = async(id) => {
           let token = otoken.access_token;
 
           for (let cadaxml of listaver){
-            console.log('verificando ', cadaxml.proy, cadaxml.name);
-            let cod = cadaxml.name.split('-')[1];
-            let anum = cadaxml.doc.num.split('-');
-            let afecha = cadaxml.doc.fecha.split('-');
-            let docum = {
-              numRuc: cadaxml.doc.ruc,
-              codComp: cod,
-              numeroSerie: anum[0],
-              numero: anum[1],
-              fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
-              monto: cadaxml.doc.total
-            };
-            let res = await Sunat.getResponse(docum, token);
-            await XmlDao.SetVerification(cadaxml._id, res);
-            ares.push(res);
+            try{
+              console.log('verificando ', cadaxml.proy, cadaxml.name);
+              let cod = cadaxml.name.split('-')[1];
+              let anum = cadaxml.doc.num.split('-');
+              let afecha = cadaxml.doc.fecha.split('-');
+              let docum = {
+                numRuc: cadaxml.doc.ruc,
+                codComp: cod,
+                numeroSerie: anum[0],
+                numero: anum[1],
+                fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
+                monto: cadaxml.doc.total
+              };
+              let res = await Sunat.getResponse(docum, token);
+              await XmlDao.SetVerification(cadaxml._id, res);
+              ares.push(res);
+            } catch (error){
+              await XmlDao.SetError(cadaxml._id, error.message);
+            }
           }
           if (listaver.length == 0){
             let fileexcel = await GeneraExcel(proy);
@@ -375,6 +382,7 @@ const procesar = async(id) => {
         return ares;
       } catch(err) {
         console.log('Error getForVerification: ', err.message);
+
       }
 
     }
@@ -398,7 +406,7 @@ const GeneraExcel = async(proy) => {
         ];
 
         for (let item of lista){
-          dataxls.push( [item.tipodoc, item.doc.num, item.doc.ruc, item.doc.razon, item.doc.total, item.success, item.message] );
+          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.ruc, item.doc.razon, item.doc.total, item.success, item.message] );
         }
 
         const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);
