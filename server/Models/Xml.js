@@ -15,9 +15,6 @@ let Xml = new Schema({
         default: null,
         required: true
     },
-    tipodoc: {
-        type: String
-    },
     doc: {
         type: Schema.Types.Mixed
     },
