@@ -144,11 +144,7 @@ let refresh = async (req, res) => {
   try {
     console.log('refresh: ', req.params.id);
     let criteria = {_id: req.params.id};
-    let cant = await CountFiles(criteria).catch(error=>{
-      //return res.status(401).json(error);
-      console.log(error);
-      return;
-    });
+    let cant = await CountFiles(criteria);
     const updProyecto = await ProyectoDAO.updateProyecto(criteria, {total:cant}, {});
     // console
     if (updProyecto) {
@@ -270,13 +266,13 @@ const SaveFile = (data) => {
 const CountFiles = (proyecto) => {
   return new Promise((resolve, reject) => {
     let dir = getPath(proyecto);
-    ObtieneXmls(proyecto)
-    .then(files=>resolve(files.length))
+    ObtieneXmls(proyecto, true)
+    .then(data=>resolve(data.files.length))
     .catch(err=>reject(err));
   })
 }
 
-const ObtieneXmls = (proyecto) => {
+const ObtieneXmls = (proyecto, todo) => {
   return new Promise((resolve, reject) => {
     let dir = getPath(proyecto);
     fs.readdir(dir, function(err, files) {
@@ -285,7 +281,7 @@ const ObtieneXmls = (proyecto) => {
       var files = files.filter(function(file){
         return path.extname(file).toLowerCase() === '.xml';
       });
-      if (files.length > 20){
+      if (!todo && files.length > 20){
         let filesminus = [];
         for (let i = 0; i < 20; i++)
           filesminus.push(files[i]);

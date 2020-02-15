@@ -2,8 +2,8 @@ var Request = require("request");
 var sunat = require("./Utilities/sunat");
 //var https = require("https");
 //var querystring = require("querystring");
-var elapse = 3000;
-var elapse_min = 3000;
+var elapse = 30000; //30 seg
+var elapse_min = 5000;  //5 seg
 //var Soap = require("./Utilities/soap");
 //Soap.getStatus();
 

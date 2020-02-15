@@ -15,7 +15,7 @@ router.post('/list', proyectoService.list);
 
 router.post('/send', proyectoService.receive);
 
-router.post('/refresh/:id', proyectoService.refresh);
+router.get('/refresh/:id', proyectoService.refresh);
 
 router.post('/procesa/:id', proyectoService.proc);
 
