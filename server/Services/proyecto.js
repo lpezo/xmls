@@ -1,8 +1,30 @@
-// const async = require("async");
-const config = require("../Utilities/config").config;
+const optxml = require("../Utilities/config").optxml;
+const getDoc = require("../Utilities/xmlConfig").getDoc;
 const ProyectoDAO = require('../DAO/proyectoDAO');
+const XmlDao = require('../DAO/xmlDAO');
+const Sunat = require('../Utilities/sunat');
+
 const fs = require('fs');
 const path = require('path');
+
+const parser = require('fast-xml-parser');
+const xlsx = require('node-xlsx');
+const zip = require('express-zip');
+
+let get = async(req, res) => {
+  let id = req.params.id;
+  try {
+    let data = await ProyectoDAO.findById(id);
+    if (data)
+      res.status(200).json(data);
+    else
+      res.status(401).json({message:'id no existe!'});
+  }
+  catch (error) {
+    res.status(403).json({message:"Something went wrong",error:error.message});
+  }
+  
+}
 
 /* API to register new proyecto */
 let add = async (req, res) => {
@@ -122,11 +144,7 @@ let refresh = async (req, res) => {
   try {
     console.log('refresh: ', req.params.id);
     let criteria = {_id: req.params.id};
-    let cant = await CountFiles(criteria).catch(error=>{
-      //return res.status(401).json(error);
-      console.log(error);
-      return;
-    });
+    let cant = await CountFiles(criteria);
     const updProyecto = await ProyectoDAO.updateProyecto(criteria, {total:cant}, {});
     // console
     if (updProyecto) {
@@ -141,16 +159,94 @@ let refresh = async (req, res) => {
   }
 }
 
+const proc = (req, res) => {
+  let id = req.params.id;
+  procesar(id).then(data=>{
+    res.status(200).json(data);
+  }).catch(error=>{
+    res.status(403).json({error:error.message});
+  })
+}
+
+const setok = async(req, res) => {
+  let id = req.params.id;
+  try {
+    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'ok'});
+    res.status(200).json(data);
+  }
+  catch (error) {
+    res.status(403).json({error:error.message});
+  }
+}
+
+const setproc = async(req, res) => {
+  let id = req.params.id;
+  try {
+    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc', excel:''});
+    res.status(200).json(data);
+  }
+  catch (error) {
+    res.status(403).json({error:error.message});
+  }
+}
+
+const deleteAll = (req, res) => {
+  let id = req.params.id;
+  XmlDao.deleteFor({proy: id}).then(data=>{
+    res.status(200).json(data);
+  }).catch(err=>{
+    res.status(403).json({error:error.message});
+  })
+  
+}
+
+const downloadExcel = (req, res) => {
+  let id = req.params.id;
+  try {
+    ProyectoDAO.findById(id).then(data=>{
+      if (data.excel){
+        let dir = path.join("xmls", id);
+        let filename = path.join(dir, data.excel);
+        //res.download(filename);
+        res.zip([
+          {path: filename, name: data.excel}
+        ])
+      }
+      else
+        res.status(403).json({error:"campo excel vacio"});
+    })
+  }
+  catch (error) {
+    res.status(403).json({error:error.message});
+  }
+}
+
 const getPath = (proyecto) => {
   let dir = './xmls';
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
-  dir = path.join(dir,  proyecto._id);
+  dir = path.join(dir,  proyecto._id.toString());
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
   return dir;
+}
+
+const ensureDirBak = (proyecto) => {
+  let dir = getPath(proyecto);
+  let dirbak = path.join(dir, "bak");
+  if (!fs.existsSync(dirbak))
+    fs.mkdirSync(dirbak);
+  return dirbak;
+}
+
+const mueve = (dir, dirbak, file) => {
+  let rutafile = path.join(dir, file);
+  let rutafilebak = path.join(dirbak, file);
+  if (fs.existsSync(rutafilebak))
+    fs.unlinkSync(rutafile);
+  fs.renameSync(rutafile, rutafilebak);
 }
 
 const SaveFile = (data) => {
@@ -170,24 +266,164 @@ const SaveFile = (data) => {
 const CountFiles = (proyecto) => {
   return new Promise((resolve, reject) => {
     let dir = getPath(proyecto);
+    ObtieneXmls(proyecto, true)
+    .then(data=>resolve(data.files.length))
+    .catch(err=>reject(err));
+  })
+}
+
+const ObtieneXmls = (proyecto, todo) => {
+  return new Promise((resolve, reject) => {
+    let dir = getPath(proyecto);
     fs.readdir(dir, function(err, files) {
       if (err)
         return reject(err);
-      resolve(files.length);
+      var files = files.filter(function(file){
+        return path.extname(file).toLowerCase() === '.xml';
+      });
+      if (!todo && files.length > 20){
+        let filesminus = [];
+        for (let i = 0; i < 20; i++)
+          filesminus.push(files[i]);
+        resolve({dir, filesminus});
+      }
+      else
+        resolve({dir, files});
     })
   })
 }
 
-let env = async (req, res) => {
-  res.status(200).json(config);
+const extraeDeXml = (dir, file) => {
+  return new Promise((resolve, reject)=>{
+    let ruta = path.join(dir, file);
+    fs.readFile(ruta, "ascii", function (err, data) {
+      if (err)
+          return reject(err);
+      try{
+        var jsonObj = parser.parse(data,optxml, true);
+        resolve(jsonObj);
+      }catch(error){
+        reject(error);
+      }
+    })
+  })
+}
+
+
+const procesar = async(id) => {
+  //let proy = await getProyectos(criteria);
+  let proy = await ProyectoDAO.findById(id);
+  if (proy){
+    if (proy.status == 'proc'){
+      //proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc'}, {new:true});
+        let dirbak = ensureDirBak(proy);
+        let data = await ObtieneXmls(proy);
+        let doc = {};
+        for (let file of data.files){
+          console.log('file:', file);
+          let dataxml = await extraeDeXml(data.dir, file);
+          //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
+          doc = getDoc(dataxml);
+          let name = path.parse(file).name;
+          try {
+            await XmlDao.saveXml(proy._id, proy.user, name, doc);
+              mueve(data.dir, dirbak, file);
+          }
+          catch (error) {
+            console.log(error.message);
+          }
+          
+        }
+        if (data.files.length == 0)
+          proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ver'}, {new:true});
+        return data.files;
+    }
+    else if (proy.status == 'ver') {
+      try {
+        let listaver = await XmlDao.getForVerification(id);
+        let ares = [];
+        if (listaver){
+          
+          let otoken = await Sunat.getToken();
+          let token = otoken.access_token;
+
+          for (let cadaxml of listaver){
+            console.log('verificando ', cadaxml.proy, cadaxml.name);
+            let cod = cadaxml.name.split('-')[1];
+            let anum = cadaxml.doc.num.split('-');
+            let afecha = cadaxml.doc.fecha.split('-');
+            let docum = {
+              numRuc: cadaxml.doc.ruc,
+              codComp: cod,
+              numeroSerie: anum[0],
+              numero: anum[1],
+              fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
+              monto: cadaxml.doc.total
+            };
+            let res = await Sunat.getResponse(docum, token);
+            await XmlDao.SetVerification(cadaxml._id, res);
+            ares.push(res);
+          }
+          if (listaver.length == 0){
+            let fileexcel = await GeneraExcel(proy);
+            
+            console.log('Excel generado: ', fileexcel);
+            proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'fin', excel: fileexcel.name});
+            return proy;
+          }
+        }
+        return ares;
+      } catch(err) {
+        console.log('Error getForVerification: ', err.message);
+      }
+
+    }
+    else
+     throw new Error('Proyecto no esta en Proceso');
+  }
+  else
+   throw new Error("Proyecto no encotrado")
+ }
+
+const GeneraExcel = async(proy) => {
+  return new Promise( (resolve, reject) => {
+    try {
+      XmlDao.getForSend(proy._id, (err, lista) => {
+
+        if (err)
+          return reject(err);
+
+        let dataxls = [
+          ["tipodoc", "numero", "ruc", "razon", "total", "success", "message"]
+        ];
+
+        for (let item of lista){
+          dataxls.push( [item.tipodoc, item.doc.num, item.doc.ruc, item.doc.razon, item.doc.total, item.success, item.message] );
+        }
+
+        const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);
+
+        let dir = path.join("xmls", proy._id.toString());
+        let name = "respuesta.xlsx";
+        let filename = path.join(dir, name);
+        console.log('grabando excel en ', filename);
+
+        fs.writeFile (filename, buffer, (err) => {
+          if (err)
+            return reject(err);
+          resolve({filename,name});
+        })
+      })
+
+    } catch(err) {
+      reject(err);
+    }
+  })
 }
 
 module.exports = {
-  add: add,
-  upd: upd,
-  env: env,
-  del: del,
-  list: list,
-  receive: receive,
-  refresh: refresh
+  get, add, upd, del, list,
+  receive, refresh, proc, 
+  setok, setproc,
+  deleteAll, downloadExcel
 };
