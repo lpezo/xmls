@@ -322,7 +322,7 @@ const procesar = async(id) => {
         for (let file of data.files){
           console.log('file:', file);
           let dataxml = await extraeDeXml(data.dir, file);
-          fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
+          //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           doc = getDoc(dataxml);
           let name = path.parse(file).name;
           try {
@@ -353,12 +353,12 @@ const procesar = async(id) => {
           for (let cadaxml of listaver){
             try{
               console.log('verificando ', cadaxml.proy, cadaxml.name);
-              let cod = cadaxml.name.split('-')[1];
+              //let cod = cadaxml.name.split('-')[1];
               let anum = cadaxml.doc.num.split('-');
               let afecha = cadaxml.doc.fecha.split('-');
               let docum = {
-                numRuc: cadaxml.doc.ruc,
-                codComp: cod,
+                numRuc: cadaxml.doc.doc,
+                codComp: cadaxml.doc.tipodoc,
                 numeroSerie: anum[0],
                 numero: anum[1],
                 fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
@@ -402,11 +402,11 @@ const GeneraExcel = async(proy) => {
           return reject(err);
 
         let dataxls = [
-          ["tipodoc", "numero", "ruc", "razon", "total", "success", "message"]
+          ["tipodoc", "numero", "doc", "razon", "moneda", "total", "success", "message"]
         ];
 
         for (let item of lista){
-          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.ruc, item.doc.razon, item.doc.total, item.success, item.message] );
+          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, item.success, item.message] );
         }
 
         const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);

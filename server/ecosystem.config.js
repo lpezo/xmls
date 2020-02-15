@@ -3,7 +3,7 @@ module.exports = {
     name: "server",
     script: "/home/pezo/xmls/server/server.js",
     path: "/home/pezo/xmls/server",
-    watch: true,
+    watch: false,
     env: {
       NODE_ENV: "dev",
       PORT:3000
@@ -17,7 +17,7 @@ module.exports = {
     name: "daemon",
     script: "/home/pezo/xmls/server/daemon.js",
     path: "/home/pezo/xmls/server",
-    watch: true,
+    watch: false,
     env: {
        NODE_ENV: "dev",
        PORT:3000
