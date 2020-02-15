@@ -79,6 +79,8 @@ const createXml = objToSave =>
           doc.tipodoc = aname.length > 1 ? aname[1] : '';
         }
         let toupd = Object.assign({user: user, doc: doc}, otro);
+        if (!toupd.status)
+          toupd.status = 'ok';
 
         Models.findOneAndUpdate(criteria, toupd, 
           {new:true, upsert: true, setDefaultsOnInsert: true}, function(err, data, res) {
