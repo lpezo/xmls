@@ -11,6 +11,8 @@ const parser = require('fast-xml-parser');
 const xlsx = require('node-xlsx');
 const zip = require('express-zip');
 
+const mail = require('../Utilities/mail');
+
 let get = async(req, res) => {
   let id = req.params.id;
   try {
@@ -376,6 +378,9 @@ const procesar = async(id) => {
             
             console.log('Excel generado: ', fileexcel);
             proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'fin', excel: fileexcel.name});
+
+            let info = await mail.sendAvisoFin(proy);
+            console.log('[Mail]', info);
             return proy;
           }
         }

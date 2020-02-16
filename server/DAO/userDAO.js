@@ -2,6 +2,16 @@
 
 var Models = require("../Models/User");
 
+const getUser = (id)=>
+  new Promise( (resolve, reject)=>{
+    Models.findById(id, (err, res)=>{
+      if (err)
+        return reject(err);
+      resolve(res);
+    })
+  });  
+
+
 const getUsers = criteria =>
   new Promise((resolve, reject) => {
     Models.find(criteria)
@@ -41,5 +51,5 @@ module.exports = {
   updateUser: updateUser,
   createUser: createUser,
   deleteUser: deleteUser,
-  getUsers: getUsers
+  getUsers: getUsers, getUser
 };
