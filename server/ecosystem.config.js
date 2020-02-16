@@ -19,8 +19,12 @@ module.exports = {
     path: "/home/pezo/xmls/server",
     watch: false,
     env: {
+       NODE_ENV: "dev",
+       PORT:3000
     },
     env_production: {
+       NODE_ENV: "production",
+       PORT:9000
     }
   }
 ]
