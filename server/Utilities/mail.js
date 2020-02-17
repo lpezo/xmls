@@ -32,7 +32,6 @@ const mailOptions = {
 
 const sendAvisoFin = (proy) => {
     return new Promise((resolve, reject)=>{
-nom
         userDao.getUser(proy.user).then(user=>{
             mailOptions.to = user.email;
             mailOptions.subject = mailOptions.subject.replace("%name%", proy.name);
