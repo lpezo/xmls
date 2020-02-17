@@ -1,12 +1,27 @@
 var nodemailer = require('nodemailer');
 var userDao = require('../DAO/userDAO');
+var fs = require('fs');
+
+var getAuth = () => {
+    let scred = fs.readFileSync('./credentials.json');
+    let cred = JSON.parse(scred);
+    let stoken = fs.readFileSync('./token.json');
+    let token = JSON.parse(stoken);
+
+    return {
+        type: 'OAuth2',
+        user: 'lpezo777@gmail.com',
+        clientId: cred.client_id,
+        clientSecret: cred.client_secret,
+        refreshToken: token.refresh_token,
+        accessToken: token.access_token,
+        expires: token.expiry_date
+    };
+}
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: {
-           user: 'lpezo777@gmail.com',
-           pass: 'enotriaweb01'
-       }
+    auth: getAuth()
    });
 
 const mailOptions = {
@@ -17,7 +32,7 @@ const mailOptions = {
 
 const sendAvisoFin = (proy) => {
     return new Promise((resolve, reject)=>{
-
+nom
         userDao.getUser(proy.user).then(user=>{
             mailOptions.to = user.email;
             mailOptions.subject = mailOptions.subject.replace("%name%", proy.name);
