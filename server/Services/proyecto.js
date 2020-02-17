@@ -11,6 +11,8 @@ const parser = require('fast-xml-parser');
 const xlsx = require('node-xlsx');
 const zip = require('express-zip');
 
+const mail = require('../Utilities/mail');
+
 let get = async(req, res) => {
   let id = req.params.id;
   try {
@@ -144,11 +146,7 @@ let refresh = async (req, res) => {
   try {
     console.log('refresh: ', req.params.id);
     let criteria = {_id: req.params.id};
-    let cant = await CountFiles(criteria).catch(error=>{
-      //return res.status(401).json(error);
-      console.log(error);
-      return;
-    });
+    let cant = await CountFiles(criteria);
     const updProyecto = await ProyectoDAO.updateProyecto(criteria, {total:cant}, {});
     // console
     if (updProyecto) {
@@ -270,13 +268,13 @@ const SaveFile = (data) => {
 const CountFiles = (proyecto) => {
   return new Promise((resolve, reject) => {
     let dir = getPath(proyecto);
-    ObtieneXmls(proyecto)
-    .then(files=>resolve(files.length))
+    ObtieneXmls(proyecto, true)
+    .then(data=>resolve(data.files.length))
     .catch(err=>reject(err));
   })
 }
 
-const ObtieneXmls = (proyecto) => {
+const ObtieneXmls = (proyecto, todo) => {
   return new Promise((resolve, reject) => {
     let dir = getPath(proyecto);
     fs.readdir(dir, function(err, files) {
@@ -285,7 +283,7 @@ const ObtieneXmls = (proyecto) => {
       var files = files.filter(function(file){
         return path.extname(file).toLowerCase() === '.xml';
       });
-      if (files.length > 20){
+      if (!todo && files.length > 20){
         let filesminus = [];
         for (let i = 0; i < 20; i++)
           filesminus.push(files[i]);
@@ -330,8 +328,11 @@ const procesar = async(id) => {
           doc = getDoc(dataxml);
           let name = path.parse(file).name;
           try {
-            await XmlDao.saveXml(proy._id, proy.user, name, doc);
-              mueve(data.dir, dirbak, file);
+            if (doc.num)
+              await XmlDao.saveXml(proy._id, proy.user, name, doc, {});
+            else
+              await XmlDao.saveXml(proy._id, proy.user, name, doc, {status:error, message:'Error en leer xml'});
+            mueve(data.dir, dirbak, file);
           }
           catch (error) {
             console.log(error.message);
@@ -352,33 +353,41 @@ const procesar = async(id) => {
           let token = otoken.access_token;
 
           for (let cadaxml of listaver){
-            console.log('verificando ', cadaxml.proy, cadaxml.name);
-            let cod = cadaxml.name.split('-')[1];
-            let anum = cadaxml.doc.num.split('-');
-            let afecha = cadaxml.doc.fecha.split('-');
-            let docum = {
-              numRuc: cadaxml.doc.ruc,
-              codComp: cod,
-              numeroSerie: anum[0],
-              numero: anum[1],
-              fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
-              monto: cadaxml.doc.total
-            };
-            let res = await Sunat.getResponse(docum, token);
-            await XmlDao.SetVerification(cadaxml._id, res);
-            ares.push(res);
+            try{
+              console.log('verificando ', cadaxml.proy, cadaxml.name);
+              //let cod = cadaxml.name.split('-')[1];
+              let anum = cadaxml.doc.num.split('-');
+              let afecha = cadaxml.doc.fecha.split('-');
+              let docum = {
+                numRuc: cadaxml.doc.doc,
+                codComp: cadaxml.doc.tipodoc,
+                numeroSerie: anum[0],
+                numero: anum[1],
+                fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
+                monto: cadaxml.doc.total
+              };
+              let res = await Sunat.getResponse(docum, token);
+              await XmlDao.SetVerification(cadaxml._id, res);
+              ares.push(res);
+            } catch (error){
+              await XmlDao.SetError(cadaxml._id, error.message);
+            }
           }
           if (listaver.length == 0){
             let fileexcel = await GeneraExcel(proy);
             
             console.log('Excel generado: ', fileexcel);
             proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'fin', excel: fileexcel.name});
+
+            let info = await mail.sendAvisoFin(proy);
+            console.log('[Mail]', info);
             return proy;
           }
         }
         return ares;
       } catch(err) {
         console.log('Error getForVerification: ', err.message);
+
       }
 
     }
@@ -398,11 +407,11 @@ const GeneraExcel = async(proy) => {
           return reject(err);
 
         let dataxls = [
-          ["tipodoc", "numero", "ruc", "razon", "total", "success", "message"]
+          ["tipodoc", "numero", "doc", "razon", "moneda", "total", "success", "message"]
         ];
 
         for (let item of lista){
-          dataxls.push( [item.tipodoc, item.doc.num, item.doc.ruc, item.doc.razon, item.doc.total, item.success, item.message] );
+          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, item.success, item.message] );
         }
 
         const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);
