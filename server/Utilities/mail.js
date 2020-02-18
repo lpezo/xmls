@@ -2,7 +2,6 @@ var nodemailer = require('nodemailer');
 var userDao = require('../DAO/userDAO');
 var fs = require('fs');
 
-/*
 var getAuth = () => {
     let scred = fs.readFileSync('./credentials.json');
     let cred = JSON.parse(scred);
@@ -16,16 +15,12 @@ var getAuth = () => {
         clientSecret: cred.client_secret,
         refreshToken: token.refresh_token,
         accessToken: token.access_token,
-        expires: token.expiry_date
+        //expires: token.expiry_date
+        expires: new Date().getTime() + 2000
     };
 }
 
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: getAuth()
-   });
-*/
-
+   /*
 var smtpConfig = {
     host: 'smtp.gmail.com',
     port: 465,
@@ -36,6 +31,7 @@ var smtpConfig = {
       pass: 'enotriaweb01' // Your password
     }
   };
+  */
 
 const mailOptions = {
     from: 'lpezo777@gmail.com',
@@ -45,7 +41,14 @@ const mailOptions = {
 
 const sendAvisoFin = (proy) => {
 
-    var transporter = nodemailer.createTransport(smtpConfig);
+    
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: getAuth()
+    });
+
+
+    //var transporter = nodemailer.createTransport(smtpConfig);
     // replace hardcoded options with data passed (somedata)
 
     return new Promise((resolve, reject)=>{
