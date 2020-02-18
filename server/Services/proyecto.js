@@ -414,7 +414,7 @@ const GeneraExcel = async(proy) => {
           let obs = "";
           if (item.data){
             if (item.data.observaciones){
-              if (item.data.observaciones.length > 1)
+              if (item.data.observaciones.length > 0)
                 obs = item.data.observaciones[0];
             }
           }
