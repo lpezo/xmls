@@ -407,11 +407,18 @@ const GeneraExcel = async(proy) => {
           return reject(err);
 
         let dataxls = [
-          ["tipodoc", "numero", "doc", "razon", "moneda", "total", "success", "message"]
+          ["tipodoc", "numero", "doc", "razon", "moneda", "total", "success", "message", "obs"]
         ];
 
         for (let item of lista){
-          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, item.success, item.message] );
+          let obs = "";
+          if (item.data){
+            if (item.data.observaciones){
+              if (item.data.observaciones.length > 1)
+                obs = item.data.observaciones[0];
+            }
+          }
+          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, item.success, item.message, obs] );
         }
 
         const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);

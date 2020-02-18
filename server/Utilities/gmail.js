@@ -3,18 +3,35 @@ const readline = require('readline');
 const {google} = require('googleapis');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://mail.google.com/'];
+const SCOPES = ['https://mail.google.com/',
+                'https://www.googleapis.com/auth/gmail.modify',
+                'https://www.googleapis.com/auth/gmail.compose',
+                'https://www.googleapis.com/auth/gmail.send'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = 'token.json';
 
-// Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Gmail API.
-  authorize(JSON.parse(content), listLabels);
-});
+const mailOptions = {
+  from: 'lpezo777@gmail.com',
+  subject: '[proceso %name%] aviso de termino de proceso',
+  html: '<p>El proceso del proyecto [%name%] ya ha terminado, puede descargar el excel desdel la pagina web del aplicativo.</p>'
+};
+
+const sendAvisoFin = (proy, user) => {
+  return new Promise((resolve, reject)=>{
+    // Load client secrets from a local file.
+    fs.readFile('credentials.json', (err, content) => {
+      if (err) return console.log('Error loading client secret file:', err);
+      // Authorize a client with credentials, then call the Gmail API.
+      mailOptions.to = user.email;
+      mailOptions.subject = mailOptions.subject.replace("%name%", proy.name);
+      mailOptions.html = mailOptions.html.replace("%name%", proy.name);
+      authorize(JSON.parse(content), listLabels);
+    });
+  })
+}
+
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -86,5 +103,24 @@ function listLabels(auth) {
     } else {
       console.log('No labels found.');
     }
+  });
+}
+
+function sendMessage(auth) {
+  /*
+  var raw = makeBody('Receiverofyouremail@mail.com', 
+    'whereyou'resendingstufffrom@gmail.com', 
+    'This is your subject', 'I got this working finally!!!');
+    */
+  const gmail = google.gmail({version: 'v1', auth});
+  gmail.users.messages.send({
+      auth: auth,
+      userId: 'me',
+      resource: {
+          raw: raw
+      }
+
+  }, function(err, response) {
+      return(err || response)
   });
 }
