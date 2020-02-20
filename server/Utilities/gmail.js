@@ -1,6 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
+var userDao = require('../DAO/userDAO');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://mail.google.com/',
@@ -18,16 +19,25 @@ const mailOptions = {
   html: '<p>El proceso del proyecto [%name%] ya ha terminado, puede descargar el excel desdel la pagina web del aplicativo.</p>'
 };
 
-const sendAvisoFin = (proy, user) => {
+const sendAvisoFin = (proy) => {
   return new Promise((resolve, reject)=>{
     // Load client secrets from a local file.
     fs.readFile('credentials.json', (err, content) => {
-      if (err) return console.log('Error loading client secret file:', err);
+      if (err) //return console.log('Error loading client secret file:', err);
+        return reject(err);
       // Authorize a client with credentials, then call the Gmail API.
-      mailOptions.to = user.email;
-      mailOptions.subject = mailOptions.subject.replace("%name%", proy.name);
-      mailOptions.html = mailOptions.html.replace("%name%", proy.name);
-      authorize(JSON.parse(content), listLabels);
+      userDao.getUser(proy.user).then(user=>{
+        mailOptions.to = user.email;
+        mailOptions.subject = mailOptions.subject.replace("%name%", proy.name);
+        mailOptions.html = mailOptions.html.replace("%name%", proy.name);
+        authorize(JSON.parse(content), sendMessage, (err, res)=>{
+          if (err)        
+            return reject(err);
+          resolve(res);
+        });
+      }).catch(err=>{
+        reject(err)
+      })
     });
   })
 }
@@ -39,7 +49,7 @@ const sendAvisoFin = (proy, user) => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
+function authorize(credentials, callback, next) {
   const {client_secret, client_id, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0]);
@@ -48,7 +58,7 @@ function authorize(credentials, callback) {
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
+    callback(oAuth2Client, next);
   });
 }
 
@@ -88,7 +98,7 @@ function getNewToken(oAuth2Client, callback) {
  *
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-function listLabels(auth) {
+function listLabels(auth, next) {
   const gmail = google.gmail({version: 'v1', auth});
   gmail.users.labels.list({
     userId: 'me',
@@ -106,12 +116,9 @@ function listLabels(auth) {
   });
 }
 
-function sendMessage(auth) {
-  /*
-  var raw = makeBody('Receiverofyouremail@mail.com', 
-    'whereyou'resendingstufffrom@gmail.com', 
-    'This is your subject', 'I got this working finally!!!');
-    */
+function sendMessage(auth, next) {
+  var raw = makeBody(mailOptions.from, mailOptions.to, 
+    mailOptions.subject, mailOptions.html);
   const gmail = google.gmail({version: 'v1', auth});
   gmail.users.messages.send({
       auth: auth,
@@ -120,7 +127,9 @@ function sendMessage(auth) {
           raw: raw
       }
 
-  }, function(err, response) {
-      return(err || response)
-  });
+  }, next);
 }
+
+nmodule.exports = {
+  sendAvisoFin
+};
