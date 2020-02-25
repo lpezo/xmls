@@ -2,6 +2,14 @@ var request = require("request");
 
 var list_chars = ["f", "b", "e"];
 
+const getTokenTest = () => {
+    return new Promise( (resolve, reject ) => {
+        setTimeout( ()=>{
+            resolve({access_token:'test'});
+        }, 10);
+    })
+};
+
 const getToken = () => {
     return new Promise( (resolve, reject ) => {
         let url = "https://api-seguridad.sunat.gob.pe/v1/clientesextranet/1491ed63-edcd-451c-98bf-08a12b257de6/oauth2/token/";
@@ -24,13 +32,25 @@ const getToken = () => {
             resolve(JSON.parse(''+ body));
         });
     })
-
-
-
-}
+};
 
 const getResponse = (cmp, token) => {
     return new Promise( (resolve, reject) => {
+
+        if (token == "test"){
+            let datatest = {
+                "estadoCp" : "1",
+                "estadoRuc" : "00",
+                "condDomiRuc" : "00",
+                "observaciones" : [ 
+                    "- El comprobante de pago consultado ha sido emitido a otro contribuyente."
+                ]
+            };
+            //setTimeout(() => {
+                resolve({data: datatest});
+            //}, 3000);
+            return;
+        }
         let url = "https://api.sunat.gob.pe/v1/contribuyente/contribuyentes/" + cmp.numRuc + "/validarcomprobante";
 
         //Establecer los parametros que se van a consultar
@@ -76,5 +96,6 @@ const getResponse = (cmp, token) => {
 
 module.exports = {
     getToken,
-    getResponse
+    getResponse,
+    getTokenTest
 }

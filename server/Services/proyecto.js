@@ -2,6 +2,7 @@ const optxml = require("../Utilities/config").optxml;
 const getDoc = require("../Utilities/xmlConfig").getDoc;
 const ProyectoDAO = require('../DAO/proyectoDAO');
 const XmlDao = require('../DAO/xmlDAO');
+const systemDao = require('../DAO/systemDAO');
 const Sunat = require('../Utilities/sunat');
 
 const fs = require('fs');
@@ -12,6 +13,7 @@ const xlsx = require('node-xlsx');
 const zip = require('express-zip');
 
 const mail = require('../Utilities/mail');
+//const daemon = require('../daemon');
 
 let get = async(req, res) => {
   let id = req.params.id;
@@ -57,7 +59,7 @@ let add = async (req, res) => {
         }
       }
     } catch (error) {
-      res.status(403).json({message:"Something went wrong",error:error});
+      res.status(403).json({message:"Something went wrong",error:error.message});
     }
   }
 };
@@ -87,7 +89,7 @@ let upd = async (req, res) => {
         }
       }
     } catch (error) {
-      res.status(403).json({message:"Something went wrong",error:error});
+      res.status(403).json({message:"Something went wrong",error:error.message});
     }
   }
 };
@@ -108,7 +110,7 @@ let del = async (req, res) => {
           res.status(200).json({message:'Proyecto deleted successfully!'})
       }
     } catch (error) {
-      res.status(403).json({message:"Something went wrong",error:error});
+      res.status(403).json({message:"Something went wrong",error:error.message});
     }
   }
 };
@@ -124,7 +126,40 @@ let list = async (req, res) => {
         res.status(401).json({message:"Something went wrong"})
     }
   } catch (error) {
-    res.status(403).json({message:"Something went wrong",error:error});
+    res.status(403).json({message:"Something went wrong",error:error.message});
+  }
+}
+
+let listtoprocess = async (req, res) => {
+  try {
+
+    /*let estaenuso = await systemDao.isInUse();
+    if (estaenuso == true)
+      return res.status(200).json([]);
+      */
+    let criteria = {status: {$in: ["proc", "ver"]}};
+    const result = await ProyectoDAO.getProyectos(criteria);
+    //if (result.length > 0)
+    //  await systemDao.setInit(true);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+        res.status(401).json({message:"Something went wrong"})
+    }
+  } catch (error) {
+    res.status(403).json({message:"Something went wrong",error:error.message});
+  }
+}
+
+let marcarfin = (req, res) => {
+  try {
+    systemDao.setInit(false).then(()=>{
+      res.status(200).json({message:"ok"});
+    }).catch(err=>{
+      res.status(403).json({message:"Something went wrong",error:err.message});
+    })
+  } catch (error) {
+    res.status(403).json({message:"Something went wrong",error:error.message});
   }
 }
 
@@ -184,7 +219,9 @@ const setok = async(req, res) => {
 const setproc = async(req, res) => {
   let id = req.params.id;
   try {
-    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc', excel:''});
+    await XmlDao.deleteFor({proy:id});
+    let data = await ProyectoDAO.findByIdAndUpdate(id, {status:'proc', excel:'', total:0});
+    //daemon.runtick();
     res.status(200).json(data);
   }
   catch (error) {
@@ -407,18 +444,14 @@ const GeneraExcel = async(proy) => {
           return reject(err);
 
         let dataxls = [
-          ["tipodoc", "numero", "doc", "razon", "moneda", "total", "success", "message", "obs"]
+          ["tipodoc", "numero", "doc", "razon", "moneda", "total", "success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"]
         ];
 
         for (let item of lista){
-          let obs = "";
-          if (item.data){
-            if (item.data.observaciones){
-              if (item.data.observaciones.length > 0)
-                obs = item.data.observaciones[0];
-            }
-          }
-          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, item.success, item.message, obs] );
+          let desc = getDataDesc(item);
+
+          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, 
+            item.success, item.message, desc.cp, desc.ruc, desc.domiruc, desc.obs1, desc.obs2] );
         }
 
         const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);
@@ -441,9 +474,85 @@ const GeneraExcel = async(proy) => {
   })
 }
 
+const getDataDesc = (item) => {
+  let desc = {cp: "", ruc: "",  domiruc: "", obs1: "", obs2: ""};
+  if (item.data){
+    if (item.data.observaciones){
+      if (item.data.observaciones.length > 0){
+        desc.obs1 = item.data.observaciones[0];
+        if (item.data.observaciones.length > 1)
+          desc.obs2 = item.data.observaciones[1];
+      }
+    }
+
+    switch (item.data.estadoCp) {
+      case "0":
+        desc.cp = "NO EXISTE";
+        break;
+      case "1":
+        desc.cp = "ACEPTADO";
+        break;
+      case "2":
+        desc.cp = "ANULADO ";
+        break;
+      case "3":
+        desc.cp = "AUTORIZADO";
+        break;
+      case "4":
+        desc.cp = "NO AUTORIZADO";
+        break;
+    }
+
+    switch (item.data.estadoRuc) {
+      case "00":
+        desc.ruc = "ACTIVO";
+        break;
+      case "01":
+        desc.ruc = "ACTIVO";
+        break;
+      case "02":
+        desc.ruc = "ACTIVO";
+        break;
+      case "03":
+        desc.ruc = "ACTIVO";
+        break;
+      case "10":
+        desc.ruc = "ACTIVO";
+        break;
+      case "11":
+        desc.ruc = "ACTIVO";
+        break;
+      case "22":
+        desc.ruc = "ACTIVO";
+        break;
+      }
+
+      switch (item.data.condDomiRuc) {
+        case "00":
+          desc.domiruc = "HABIDO";
+          break;
+        case "09":
+          desc.domiruc = "PENDIENTE";
+          break;
+        case "11":
+          desc.domiruc = "POR VERIFICAR";
+          break;
+        case "12":
+          desc.domiruc = "NO HABIDO";
+          break;
+        case "20":
+          desc.domiruc = "NO HALLADO";
+          break;
+      }
+
+  }
+  return desc;
+}
+
 module.exports = {
   get, add, upd, del, list,
   receive, refresh, proc, 
   setok, setproc,
-  deleteAll, downloadExcel
+  deleteAll, downloadExcel,
+  listtoprocess, marcarfin
 };

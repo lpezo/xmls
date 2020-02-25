@@ -9,6 +9,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 var User = require('./Models/User')
 
+var system = require('./DAO/systemDAO');
+
 // var mongoose1 = require('mongoose');
 
 const mongoose = require('./Utilities/mongooseConfig')();
@@ -59,6 +61,9 @@ app.use((req, res, next) => {
 /**
  * Start Express server.
  */
+
+system.setInit(false);
+
 server.listen(config.NODE_SERVER_PORT.port, () => {
   console.log('app listening on port:' + config.NODE_SERVER_PORT.port);
 });

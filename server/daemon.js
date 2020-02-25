@@ -2,42 +2,92 @@ var Request = require("request");
 var {config} = require("./Utilities/config");
 //var https = require("https");
 //var querystring = require("querystring");
-var elapse = 30000; //30 seg
-var elapse_min = 5000;  //5 seg
+var elapse = config.WAITDAEMON; //30 seg
+var elapse_min = 5000;  //2 seg
 //var Soap = require("./Utilities/soap");
 //Soap.getStatus();
+let initloop = () => {
+    setTimeout(function tick() {
+        runtick();
+    }, elapse);
+}
 
-
-let timerId = setTimeout(function tick() {
+let serviciotick = (req, res) => {
     console.log('tick');
     ejecutar().then((data)=>{
         let proyectos = JSON.parse(data);
-        console.log('fin tick');
         if (proyectos.length > 0) {
+            //marcar aqui en proceso
             let ids = proyectos.map(item=>{
                 return item._id;
             })
             console.log('ids:', ids);
             procesar(ids).then(()=>{
-                timerId = setTimeout(tick, elapse_min); 
+                //marcar aqui fin de proceso
+                marcarfin().then( () => {
+                    timerId = setTimeout(runtick, elapse_min); 
+                }).catch(err=>{
+                    timerId = setTimeout(runtick, elapse); 
+                })
             })
         }
         else
-            timerId = setTimeout(tick, elapse);
+            res.status(200).json("fin tick");
+    }).catch(err=>{
+        res.status(403).json({message:"Something went wrong",error:err.message});
+    }); 
+}
+
+let runtick = () => {
+    console.log('tick');
+    ejecutar().then((data)=>{
+        console.log('ejecutar() data:', data);
+        let proyectos = JSON.parse(data);
+        if (proyectos.length > 0) {
+            //marcar aqui en proceso
+            let ids = proyectos.map(item=>{
+                return item._id;
+            })
+            console.log('ids:', ids);
+            procesar(ids).then(()=>{
+                //marcar aqui fin de proceso
+                //marcarfin().then( () => {
+                    timerId = setTimeout(runtick, elapse_min); 
+                //}).catch(err=>{
+                //    timerId = setTimeout(runtick, elapse); 
+                //})
+            }).catch(err=>{
+                //marcarfin().then(()=>{
+                    timerId = setTimeout(runtick, elapse); 
+                //});
+            })
+        }
+        else
+            timerId = setTimeout(runtick, elapse);
     }).catch(err=>{
         console.log(err.message);
-    })
-}, elapse);
+    });
+}
 
+let marcarfin = () => {
+    return new Promise((resolve, reject) => {
+        Request.put({
+            "headers": { "content-type": "application/json" },
+            "url": config.NODE_SERVER + "/proy/marcarfin"
+          }, 
+            (error, response) => {
+            if (error)
+                return reject(error);
+            resolve(response);
+        })
+    });
+}
 
 let ejecutar = () => {
     return new Promise((resolve, reject) => {
         Request.post({
             "headers": { "content-type": "application/json" },
-            "url": config.NODE_SERVER + "/proy/list",
-            "body": JSON.stringify({
-                "status": {$in: ["proc", "ver"]}
-            })
+            "url": config.NODE_SERVER + "/proy/listtoprocess"
           }, 
             (error, response, body) => {
             if (error)
@@ -77,13 +127,12 @@ let procesa = (index, ids) => {
 
 }
 
-/*
-sunat.getToken( (err, data) => {
-    if (err)
-        console.log(err.message);
-    else {
-        console.log(data.access_token);
-    }
-});
+initloop();
 
+/*
+module.exports = {
+    initloop,
+    serviciotick,
+    runtick
+};
 */

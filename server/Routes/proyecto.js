@@ -26,4 +26,10 @@ router.delete('/deletexml/:id', proyectoService.deleteAll);
 
 router.get('/excel/:id', proyectoService.downloadExcel);
 
+router.post('/listtoprocess', proyectoService.listtoprocess);
+
+router.put('/marcarfin', proyectoService.marcarfin);
+
+//router.post('/tick', daemon.serviciotick);
+
 module.exports = router;

@@ -96,7 +96,7 @@ const createXml = objToSave =>
       Models.deleteMany(criteria, (err, result)=> {
         if (err)
           return reject(err);
-          resolve (res);
+          resolve (result);
       })
     })
   }

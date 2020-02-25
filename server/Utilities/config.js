@@ -8,14 +8,16 @@ let serverURLs = {
         "NODE_SERVER_PORT": "3000",
         "MONGO_DB": "mongodb://localhost:27017/angular-login-register",
         "MONGO_USER": null,
-        "MONGO_PWD": null
+        "MONGO_PWD": null,
+        "WAITDAEMON": 10000
     },
     "production": {
         "NODE_SERVER": process.env.HOST || "http://localhost",
         "NODE_SERVER_PORT": process.env.PORT || 3000,
         "MONGO_DB": "mongodb://"+process.env.COSMOSDB_HOST+":"+process.env.COSMOSDB_PORT+"/"+process.env.COSMOSDB_DBNAME+"?ssl=true&replicaSet=globaldb",
         "MONGO_USER": process.env.COSMODDB_USER,
-        "MONGO_PWD": process.env.COSMOSDB_PASSWORD        
+        "MONGO_PWD": process.env.COSMOSDB_PASSWORD,
+        "WAITDAEMON": 30000
     }
 }
         //"mongodb://xmls:ASCiraWyrtSm87Wc7jDOF1NUaoW1cyQ389dl8GFDoyuvowFbPrmbdN5YvwpnYquPhtdWA3OJSM2pYGdZjnLpOw==@xmls.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
@@ -32,7 +34,8 @@ let config = {
     "NODE_SERVER_URL": {
         "url": `${serverURLs[environment].NODE_SERVER}`
     },
-    "NODE_SERVER": `${serverURLs[environment].NODE_SERVER}:${serverURLs[environment].NODE_SERVER_PORT}`
+    "NODE_SERVER": `${serverURLs[environment].NODE_SERVER}:${serverURLs[environment].NODE_SERVER_PORT}`,
+    "WAITDAEMON": `${serverURLs[environment].WAITDAEMON}`
 };
 
 var optxml = {
