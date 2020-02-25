@@ -71,9 +71,8 @@ const getDoc = (data) => {
         
         result[item.name] = obj;
     }
-    if (typeof(result.tipodoc) == "number"){
-        let temp = "00" + result.tipodoc;
-        result.tipodoc = temp.substr(temp.length-2);
+    if (typeof(result.tipodoc) == "string" && result.tipodoc.length == 1){
+        result.tipodoc = "0" + result.tipodoc;
     }
     return result;
 }

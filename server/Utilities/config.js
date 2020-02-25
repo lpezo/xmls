@@ -17,7 +17,7 @@ let serverURLs = {
         "MONGO_DB": "mongodb://"+process.env.COSMOSDB_HOST+":"+process.env.COSMOSDB_PORT+"/"+process.env.COSMOSDB_DBNAME+"?ssl=true&replicaSet=globaldb",
         "MONGO_USER": process.env.COSMODDB_USER,
         "MONGO_PWD": process.env.COSMOSDB_PASSWORD,
-        "WAITDAEMON": 30000
+        "WAITDAEMON": 15000
     }
 }
         //"mongodb://xmls:ASCiraWyrtSm87Wc7jDOF1NUaoW1cyQ389dl8GFDoyuvowFbPrmbdN5YvwpnYquPhtdWA3OJSM2pYGdZjnLpOw==@xmls.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"

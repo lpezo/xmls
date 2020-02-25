@@ -3,7 +3,7 @@ var {config} = require("./Utilities/config");
 //var https = require("https");
 //var querystring = require("querystring");
 var elapse = config.WAITDAEMON; //30 seg
-var elapse_min = 5000;  //2 seg
+var elapse_min = 2000;  //2 seg
 //var Soap = require("./Utilities/soap");
 //Soap.getStatus();
 let initloop = () => {
