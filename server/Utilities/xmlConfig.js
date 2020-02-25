@@ -15,6 +15,8 @@ let defDefault =
         {"name": "total", "path": "cac:LegalMonetaryTotal/cbc:PayableAmount", "desc": "Total"},
         {"name": "subtotal", "path": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount", "desc": "Sub Total"},
         {"name": "igv", "path": "cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
+        
+        {"name": "tipodoc", "path": "cbc:InvoiceTypeCode", "desc": "Tipo de Documento"}
     ];
 
 let defDebiNote = 
@@ -66,6 +68,7 @@ const getDoc = (data) => {
         }
         if (typeof(obj) == 'number')
             obj = obj.toString();
+        
         result[item.name] = obj;
     }
     return result;
