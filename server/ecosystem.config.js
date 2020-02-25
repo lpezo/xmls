@@ -1,8 +1,8 @@
 module.exports = {
   apps : [{
     name: "server",
-    script: "/home/pezo/xmls/server/server.js",
-    path: "/home/pezo/xmls/server",
+    script: "/opt/projects/xmls/server/server.js",
+    path: "/opt/projects/xmls/server",
     watch: false,
     env: {
       NODE_ENV: "dev",
@@ -15,8 +15,8 @@ module.exports = {
   },
   {
     name: "daemon",
-    script: "/home/pezo/xmls/server/daemon.js",
-    path: "/home/pezo/xmls/server",
+    script: "/opt/projects/xmls/server/daemon.js",
+    path: "/opt/projects/xmls/server",
     watch: false,
     env: {
        NODE_ENV: "dev",
