@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sac="urn:sunat:names:specification:ubl:peru:schema:xsd:SunatAggregateComponents-1" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 UBLTR-Invoice-2.0.xsd">
+    <ext:UBLExtensions>
+        <ext:UBLExtension>
+            <ext:ExtensionContent>
+                <sac:AdditionalInformation>
+                    <sac:AdditionalMonetaryTotal>
+                        <cbc:ID>1001</cbc:ID>
+                        <cbc:PayableAmount currencyID="PEN">407</cbc:PayableAmount>
+                    </sac:AdditionalMonetaryTotal>
+                    <sac:AdditionalMonetaryTotal>
+                        <cbc:ID>1002</cbc:ID>
+                        <cbc:PayableAmount currencyID="PEN">0</cbc:PayableAmount>
+                    </sac:AdditionalMonetaryTotal>
+                    <sac:AdditionalMonetaryTotal>
+                        <cbc:ID>1003</cbc:ID>
+                        <cbc:PayableAmount currencyID="PEN">0</cbc:PayableAmount>
+                    </sac:AdditionalMonetaryTotal>
+                    <sac:AdditionalMonetaryTotal>
+                        <cbc:ID>1004</cbc:ID>
+                        <cbc:PayableAmount currencyID="PEN">0</cbc:PayableAmount>
+                    </sac:AdditionalMonetaryTotal>
+                    <sac:AdditionalMonetaryTotal>
+                        <cbc:ID>2003</cbc:ID>
+                        <sac:ReferenceAmount currencyID="PEN">480.26</sac:ReferenceAmount>
+                        <cbc:PayableAmount currencyID="PEN">19</cbc:PayableAmount>
+                        <cbc:Percent>4</cbc:Percent>
+                    </sac:AdditionalMonetaryTotal>
+                </sac:AdditionalInformation>
+            </ext:ExtensionContent>
+        </ext:UBLExtension>
+    <ext:UBLExtension><ext:ExtensionContent><ds:Signature Id="Signature365778" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>pSg8ZaEpKURLH8fB9Q80LKq50Pk=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>Wiu+2zKBg5LZMssk22z+LOXkiHCE+3k1lECn8ogfMUVTVNE5rJR/k6cVjxWyLXIWDd8r89wQoZbt6e78p3nlXHXCeBnnTxjfwc8cK4NaP99TuFk9I//N4hyDr9w2njucJhXdnUOi6KHLicPMBYlV02jjpmxsqCMJw1KPlkj0bkHtK2mSMp6Vp9/6/D2k1Y2cA9sF0iK/KfyDLI8/HdMx8oy1BZCqmPv9O3rcT02sKfJaHtcxRymoHlZ9sBgytM6YAcTK268f9quOriIqp4OC9F/WPSfZ/EW4LuLoIFtsvxf0vnkTaNIJEWA5hxyrmekaLQzetKRPTdiZWRNHu3doUg==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509SubjectName>CN=CEVA PERU ADUANAS S.A.C.</ds:X509SubjectName><ds:X509Certificate>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</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent></ext:UBLExtension></ext:UBLExtensions>
+    <cbc:UBLVersionID>2.0</cbc:UBLVersionID>
+    <cbc:CustomizationID>1.0</cbc:CustomizationID>
+    <cbc:ID>F001-11804</cbc:ID>
+    <cbc:IssueDate>2018-04-18</cbc:IssueDate>
+    <cbc:InvoiceTypeCode>01</cbc:InvoiceTypeCode>
+    <cbc:DocumentCurrencyCode>PEN</cbc:DocumentCurrencyCode>
+    <cac:Signature><cbc:ID>Signature365778</cbc:ID><cac:SignatoryParty><cac:PartyIdentification><cbc:ID>20521206919</cbc:ID></cac:PartyIdentification><cac:PartyName><cbc:Name>CEVA ADUANAS PERU</cbc:Name></cac:PartyName></cac:SignatoryParty><cac:DigitalSignatureAttachment><cac:ExternalReference><cbc:URI>#Signature365778</cbc:URI></cac:ExternalReference></cac:DigitalSignatureAttachment></cac:Signature><cac:AccountingSupplierParty>
+        <cbc:CustomerAssignedAccountID>20521206919</cbc:CustomerAssignedAccountID>
+        <cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+        <cac:Party>
+            <cac:PartyName>
+                <cbc:Name>CEVA PERU ADUANAS S.A.C.</cbc:Name>
+            </cac:PartyName>
+            <cac:PostalAddress>
+                <cbc:ID>150122</cbc:ID>
+                <cbc:StreetName>AV. JOSE A. LARCO 1301 INT. 901</cbc:StreetName>
+                <cbc:CitySubdivisionName>-</cbc:CitySubdivisionName>
+                <cbc:CityName>LIMA</cbc:CityName>
+                <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>
+                <cbc:District>MIRAFLORES</cbc:District>
+                <cac:Country>
+                    <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>CEVA PERU ADUANAS S.A.C.</cbc:RegistrationName>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingSupplierParty>
+    <cac:AccountingCustomerParty>
+        <cbc:CustomerAssignedAccountID>20100078792</cbc:CustomerAssignedAccountID>
+        <cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+        <cac:Party>
+            <cac:PostalAddress>
+                <cbc:StreetName>AV. CARRETERA CENTRAL KM. 4.7 Z.I. ASOC EXFUNDO SAN ISIDRO-SANTA ANITA</cbc:StreetName>
+                <cbc:CityName>LIMA</cbc:CityName>
+                <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>
+                <cac:Country>
+                    <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>PRODUCTOS AVON S A</cbc:RegistrationName>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingCustomerParty>
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="PEN">73.26</cbc:TaxAmount>
+        <cac:TaxSubtotal>
+            <cbc:TaxAmount currencyID="PEN">73.26</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cac:TaxScheme>
+                    <cbc:ID>1000</cbc:ID>
+                    <cbc:Name>IGV</cbc:Name>
+                    <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:LegalMonetaryTotal>
+        <cbc:PayableAmount currencyID="PEN">480.26</cbc:PayableAmount>
+    </cac:LegalMonetaryTotal>
+    <cac:InvoiceLine>
+        <cbc:ID>1</cbc:ID>
+        <cbc:InvoicedQuantity unitCode="LS">1</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="PEN">407</cbc:LineExtensionAmount>
+        <cac:PricingReference>
+            <cac:AlternativeConditionPrice>
+                <cbc:PriceAmount currencyID="PEN">480.26</cbc:PriceAmount>
+                <cbc:PriceTypeCode>01</cbc:PriceTypeCode>
+            </cac:AlternativeConditionPrice>
+        </cac:PricingReference>
+        <cac:TaxTotal>
+            <cbc:TaxAmount currencyID="PEN">73.26</cbc:TaxAmount>
+            <cac:TaxSubtotal>
+                <cbc:TaxAmount currencyID="PEN">73.26</cbc:TaxAmount>
+                <cac:TaxCategory>
+                    <cbc:TaxExemptionReasonCode>10</cbc:TaxExemptionReasonCode>
+                    <cac:TaxScheme>
+                        <cbc:ID>1000</cbc:ID>
+                        <cbc:Name>IGV</cbc:Name>
+                        <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+                    </cac:TaxScheme>
+                </cac:TaxCategory>
+            </cac:TaxSubtotal>
+        </cac:TaxTotal>
+        <cac:Item>
+            <cbc:Description>Transporte Localpeso 158.40 kg</cbc:Description>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="PEN">407</cbc:PriceAmount>
+        </cac:Price>
+    </cac:InvoiceLine>
+</Invoice>

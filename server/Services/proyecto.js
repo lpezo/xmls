@@ -446,13 +446,14 @@ const GeneraExcel = async(proy) => {
           return reject(err);
 
         let dataxls = [
-          ["tipodoc", "serie", "numero", "doc", "razon", "moneda", "total", "success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"]
+          ["tipodoc", "serie", "numero", "doc", "razon", "moneda", "igv", "total", "success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"]
         ];
 
         for (let item of lista){
           let desc = getDataDesc(item);
 
-          dataxls.push( [item.doc.tipodoc, item.doc.serie, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, 
+          dataxls.push( [item.doc.tipodoc, item.doc.serie, item.doc.num, item.doc.doc, item.doc.razon, 
+            item.doc.moneda, item.igv, item.doc.total, 
             item.success, item.message, desc.cp, desc.ruc, desc.domiruc, desc.obs1, desc.obs2] );
         }
 

@@ -18,7 +18,14 @@ let defDefault =
         {"name": "subtotal", "path": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount", "desc": "Sub Total"},
         {"name": "igv", "path": "cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
         
-        {"name": "tipodoc", "path": "cbc:InvoiceTypeCode", "desc": "Tipo de Documento"}
+        {"name": "tipodoc", "path": "cbc:InvoiceTypeCode", "desc": "Tipo de Documento"},
+        
+        {"name": "line", "path": "cac:InvoiceLine", "desc": "Linea", "items": [
+            {"name": "id", "path": "cbc:ID", "desc":"ID"},
+            {"name": "base_imponible", "path": "cbc:LineExtensionAmount", "desc":"Base Imponible"},
+            {"name": "glosa", "path": "cac:Item/cbc:Description", "desc": "Glosa"}
+        ]}
+        
     ];
 
 let defDebiNote = 
@@ -55,33 +62,21 @@ const getDoc = (data) => {
         }
     }
     for (let item of def){
-        let obj = data;
-        if (Array.isArray(item.path)){
-            for (let cadapath of item.path){
-                obj = data;
-                cadapath.split('/').forEach(function(tag){
-                    if (obj != null && obj.hasOwnProperty(tag))
-                        obj = obj[tag];
-                    else
-                        obj = null;
-                });
-                if (obj != null)
-                    break;
-            }
-        }
-        else {
-            item.path.split('/').forEach(function(tag){
-                if (obj != null && obj.hasOwnProperty(tag))
-                    obj = obj[tag];
-                else
-                    obj = null;
-            });
-        }
+        let obj = getobj(data, item);
         if (obj != null){
-            if (obj.__cdata)
-                obj = obj.__cdata;
-            else if (obj["#text"])
-                obj = obj["#text"];
+            
+            if (item.items && Array.isArray(obj)){
+                let lines = [];
+                let line = {};
+                for (let cadaline of obj){
+                    for (let cadaitem of item.items){
+                        let valor = getobj(cadaline, cadaitem);
+                        line[cadaitem.name] = valor;
+                    }
+                    lines.push(line);
+                }
+                obj = lines;
+            }
         }
         if (typeof(obj) == 'number')
             obj = obj.toString();
@@ -99,6 +94,36 @@ const getDoc = (data) => {
             result.num = anum[1];
     }
     return result;
+}
+
+const getobj = (data, item) => {
+    let obj = data;
+    if (Array.isArray(item.path)){
+        for (let cadapath of item.path){
+            obj = data;
+            cadapath.split('/').forEach(function(tag){
+                if (obj != null && obj.hasOwnProperty(tag))
+                    obj = obj[tag];
+                else
+                    obj = null;
+            });
+            if (obj != null)
+                break;
+        }
+    }
+    else {
+        item.path.split('/').forEach(function(tag){
+            if (obj != null && obj.hasOwnProperty(tag))
+                obj = obj[tag];
+            else
+                obj = null;
+        });
+    }
+    if (obj.__cdata)
+        obj = obj.__cdata;
+    else if (obj["#text"])
+        obj = obj["#text"];
+    return obj;
 }
 
 module.exports = {
