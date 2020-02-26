@@ -6,7 +6,9 @@ let defDefault =
         {"name": "fecha", "path": "cbc:IssueDate", "desc": "Fecha de Documento"},
         {"name": "hora", "path": "cbc:IssueTime", "desc": "Hora de Documento"},
 
-        {"name": "doc", "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID", "desc": "Numero Documento"},
+        {"name": "doc", "path": ["cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID",
+                                 "cac:AccountingCustomerParty/cbc:CustomerAssignedAccountID"],
+             "desc": "Numero Documento"},
         {"name": "razon", "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name", "desc": "Nombre Empresa"},
 
         {"name": "ref", "path": "cac:Signature/cac:DigitalSignatureAttachment/cac:ExternalReference/cbc:URI", "desc": "Número Referencia"},
@@ -54,12 +56,27 @@ const getDoc = (data) => {
     }
     for (let item of def){
         let obj = data;
-        item.path.split('/').forEach(function(tag){
-            if (obj != null && obj.hasOwnProperty(tag))
-                obj = obj[tag];
-            else
-                obj = null;
-        });
+        if (Array.isArray(item.path)){
+            for (let cadapath of item.path){
+                obj = data;
+                cadapath.split('/').forEach(function(tag){
+                    if (obj != null && obj.hasOwnProperty(tag))
+                        obj = obj[tag];
+                    else
+                        obj = null;
+                });
+                if (obj != null)
+                    break;
+            }
+        }
+        else {
+            item.path.split('/').forEach(function(tag){
+                if (obj != null && obj.hasOwnProperty(tag))
+                    obj = obj[tag];
+                else
+                    obj = null;
+            });
+        }
         if (obj != null){
             if (obj.__cdata)
                 obj = obj.__cdata;
@@ -73,6 +90,13 @@ const getDoc = (data) => {
     }
     if (typeof(result.tipodoc) == "string" && result.tipodoc.length == 1){
         result.tipodoc = "0" + result.tipodoc;
+    }
+    if (result.num){
+        let anum = result.num.split('-');
+        if (anum.length > 0)
+            result.serie = anum[0];
+        if (anum.length > 1)
+            result.num = anum[1];
     }
     return result;
 }

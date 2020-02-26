@@ -393,13 +393,15 @@ const procesar = async(id) => {
             try{
               console.log('verificando ', cadaxml.proy, cadaxml.name);
               //let cod = cadaxml.name.split('-')[1];
-              let anum = cadaxml.doc.num.split('-');
+              //let anum = cadaxml.doc.num.split('-');
               let afecha = cadaxml.doc.fecha.split('-');
+              if (!cadaxml.doc.doc)
+                throw new Error("No se pudo obtener el Documento");
               let docum = {
                 numRuc: cadaxml.doc.doc,
                 codComp: cadaxml.doc.tipodoc,
-                numeroSerie: anum[0],
-                numero: anum[1],
+                numeroSerie: cadaxml.doc.serie,
+                numero: cadaxml.doc.num,
                 fechaEmision: afecha[2] + "/" + afecha[1] + "/" + afecha[0],
                 monto: cadaxml.doc.total
               };
@@ -444,13 +446,13 @@ const GeneraExcel = async(proy) => {
           return reject(err);
 
         let dataxls = [
-          ["tipodoc", "numero", "doc", "razon", "moneda", "total", "success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"]
+          ["tipodoc", "serie", "numero", "doc", "razon", "moneda", "total", "success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"]
         ];
 
         for (let item of lista){
           let desc = getDataDesc(item);
 
-          dataxls.push( [item.doc.tipodoc, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, 
+          dataxls.push( [item.doc.tipodoc, item.doc.serie, item.doc.num, item.doc.doc, item.doc.razon, item.doc.moneda, item.doc.total, 
             item.success, item.message, desc.cp, desc.ruc, desc.domiruc, desc.obs1, desc.obs2] );
         }
 
