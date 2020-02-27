@@ -44,6 +44,12 @@ let defDebiNote =
         {"name": "total", "path": "cac:RequestedMonetaryTotal/cbc:PayableAmount", "desc": "Total"},
         {"name": "subtotal", "path": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount", "desc": "Sub Total"},
         {"name": "igv", "path": "cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
+
+        {"name": "line", "path": "cac:InvoiceLine", "desc": "Linea", "items": [
+            {"name": "id", "path": "cbc:ID", "desc":"ID"},
+            {"name": "base_imponible", "path": "cbc:LineExtensionAmount", "desc":"Base Imponible"},
+            {"name": "glosa", "path": "cac:Item/cbc:Description", "desc": "Glosa"}
+        ]}
     ];
 
 
@@ -65,17 +71,25 @@ const getDoc = (data) => {
         let obj = getobj(data, item);
         if (obj != null){
             
-            if (item.items && Array.isArray(obj)){
-                let lines = [];
-                let line = {};
-                for (let cadaline of obj){
+            if (item.items){
+                if (Array.isArray(obj)){
+                    let lines = obj.map(function(cadaline){
+                        let line = {};
+                        for (let cadaitem of item.items){
+                            let valor = getobj(cadaline, cadaitem);
+                            line[cadaitem.name] = valor;
+                        }
+                        return line;
+                    });
+                    obj = lines;
+                } else {
+                    let line = {};
                     for (let cadaitem of item.items){
-                        let valor = getobj(cadaline, cadaitem);
+                        let valor = getobj(obj, cadaitem);
                         line[cadaitem.name] = valor;
                     }
-                    lines.push(line);
+                    obj = [line];
                 }
-                obj = lines;
             }
         }
         if (typeof(obj) == 'number')
@@ -119,10 +133,12 @@ const getobj = (data, item) => {
                 obj = null;
         });
     }
-    if (obj.__cdata)
-        obj = obj.__cdata;
-    else if (obj["#text"])
-        obj = obj["#text"];
+    if (obj != null){
+        if (obj.__cdata)
+            obj = obj.__cdata;
+        else if (obj["#text"])
+            obj = obj["#text"];
+    }
     return obj;
 }
 
