@@ -324,7 +324,7 @@ const ObtieneXmls = (proyecto, todo) => {
         let filesminus = [];
         for (let i = 0; i < 20; i++)
           filesminus.push(files[i]);
-        resolve({dir, filesminus});
+        resolve({dir, files: filesminus});
       }
       else
         resolve({dir, files});
