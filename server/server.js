@@ -7,7 +7,9 @@ const path = require('path');
 const server = require('http').Server(app);
 const bodyParser = require('body-parser');
 const cors = require('cors');
-var User = require('./Models/User')
+
+const io = require('socket.io')(server);
+global.socketio = io;
 
 var system = require('./DAO/systemDAO');
 
@@ -61,6 +63,13 @@ app.use((req, res, next) => {
 /**
  * Start Express server.
  */
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
 
 system.setInit(false);
 
