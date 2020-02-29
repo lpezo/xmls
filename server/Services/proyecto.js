@@ -392,7 +392,7 @@ const procesar = async(id) => {
         let ares = [];
         if (listaver){
           
-          let otoken = await Sunat.getTokenTest();
+          let otoken = await Sunat.getToken();
           let token = otoken.access_token;
 
           for (let cadaxml of listaver){
