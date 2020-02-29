@@ -66,7 +66,10 @@ app.use((req, res, next) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected');
-  socket.on('disconnect', () => {
+  socket.on("messages", function(data){
+      console.log(data);
+  });
+ socket.on('disconnect', () => {
     console.log('user disconnected');
   });
 });
