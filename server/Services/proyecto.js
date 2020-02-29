@@ -376,8 +376,10 @@ const procesar = async(id) => {
           }
           
         }
-        if (data.files.length == 0)
+        if (data.files.length == 0){
           proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'ver'}, {new:true});
+          global.socketio.emit("refresh", {user: proy.user, proy: proy._id.toString()});
+        }
         return data.files;
     }
     else if (proy.status == 'ver') {
@@ -417,9 +419,9 @@ const procesar = async(id) => {
             
             console.log('Excel generado: ', fileexcel);
             proy = await ProyectoDAO.findByIdAndUpdate(id, {status:'fin', excel: fileexcel.name});
-
-            let info = await mail.sendAvisoFin(proy);
-            console.log('[Mail]', info);
+            global.socketio.emit("refresh", {user: proy.user, proy: proy._id.toString()});
+            //let info = await mail.sendAvisoFin(proy);
+            //console.log('[Mail]', info);
             return proy;
           }
         }
