@@ -138,8 +138,11 @@ const getDoc = (data) => {
         }
         if (typeof(obj) == 'number')
             obj = obj.toString();
-        if (!item.items)
-            result[item.name] = obj;
+        if (!item.items){
+            if (!result[item.name])
+                result[item.name] = obj;
+            
+        }
     }
     /*
     if (typeof(result.tipodoc) == "string" && result.tipodoc.length == 1){
