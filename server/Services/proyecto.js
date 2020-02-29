@@ -1,5 +1,5 @@
 const optxml = require("../Utilities/config").optxml;
-const getDoc = require("../Utilities/xmlConfig").getDoc;
+const {getDoc, def} = require("../Utilities/xmlConfig");
 const ProyectoDAO = require('../DAO/proyectoDAO');
 const XmlDao = require('../DAO/xmlDAO');
 const systemDao = require('../DAO/systemDAO');
@@ -283,9 +283,11 @@ const ensureDirBak = (proyecto) => {
 const mueve = (dir, dirbak, file) => {
   let rutafile = path.join(dir, file);
   let rutafilebak = path.join(dirbak, file);
-  if (fs.existsSync(rutafilebak))
-    fs.unlinkSync(rutafile);
-  fs.renameSync(rutafile, rutafilebak);
+  if (fs.existsSync(rutafile)){
+    if (fs.existsSync(rutafilebak))
+      fs.unlinkSync(rutafilebak);
+    fs.renameSync(rutafile, rutafilebak);
+  }
 }
 
 const SaveFile = (data) => {
@@ -362,17 +364,19 @@ const procesar = async(id) => {
           console.log('file:', file);
           let dataxml = await extraeDeXml(data.dir, file);
           //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
-          doc = getDoc(dataxml);
           let name = path.parse(file).name;
           try {
+            doc = getDoc(dataxml);
             if (doc.num)
               await XmlDao.saveXml(proy._id, proy.user, name, doc, {});
             else
-              await XmlDao.saveXml(proy._id, proy.user, name, doc, {status:error, message:'Error en leer xml'});
+              await XmlDao.saveXml(proy._id, proy.user, name, doc, {status:'error', message:'Error en leer xml'});
             mueve(data.dir, dirbak, file);
           }
           catch (error) {
             console.log(error.message);
+            await XmlDao.saveXml(proy._id, proy.user, name, doc, {status:'error', message:error.message});
+            mueve(data.dir, dirbak, file);
           }
           
         }
@@ -388,7 +392,7 @@ const procesar = async(id) => {
         let ares = [];
         if (listaver){
           
-          let otoken = await Sunat.getToken();
+          let otoken = await Sunat.getTokenTest();
           let token = otoken.access_token;
 
           for (let cadaxml of listaver){
@@ -447,22 +451,47 @@ const GeneraExcel = async(proy) => {
         if (err)
           return reject(err);
 
+        /*
         let dataxls = [
           ["tipodoc", "serie", "numero", "doc", "razon", "moneda", "igv", "total", "base imponible", "glosa",
             "success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"]
         ];
+        */
+        let cabEstado = ["success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"];
+        let headers = [];
+        for (let cadadef of def){
+          if (cadadef.items){
+            for (let cadadet of cadadef.items){
+              headers.push(cadadet.desc);
+            }
+          }
+          else
+            headers.push(cadadef.desc);
+        }
+        let headersBoth = headers.concat(cabEstado);
+        let dataxls = [headersBoth];
 
         for (let item of lista){
           let desc = getDataDesc(item);
 
+          /*
           let detalle = {id: 0, base_imponible: 0, glosa: ""};
           if (item.doc.line && item.doc.line.length > 0){
             detalle = item.doc.line[0];
           }
-
+          */
+          /*
           dataxls.push( [item.doc.tipodoc, item.doc.serie, item.doc.num, item.doc.doc, item.doc.razon, 
             item.doc.moneda, item.doc.igv, item.doc.total, detalle.base_imponible, detalle.glosa,
             item.success, item.message, desc.cp, desc.ruc, desc.domiruc, desc.obs1, desc.obs2] );
+            */
+
+          let row = Object.values(item.doc);
+          if (row.length == 0)
+            row = headers.map(val=>{return "";});
+          let rowEstado = [item.success, item.message, desc.cp, desc.ruc, desc.domiruc, desc.obs1, desc.obs2];
+          row = row.concat(rowEstado);
+          dataxls.push(row);
         }
 
         const buffer = xlsx.build([{name:"mensajes", data: dataxls}]);
