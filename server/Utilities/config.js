@@ -23,6 +23,7 @@ let serverURLs = {
         //"mongodb://xmls:ASCiraWyrtSm87Wc7jDOF1NUaoW1cyQ389dl8GFDoyuvowFbPrmbdN5YvwpnYquPhtdWA3OJSM2pYGdZjnLpOw==@xmls.documents.azure.com:10255/?ssl=true&replicaSet=globaldb"
 
 let config = {
+    "ENV": environment,
     "DB_URL": {
         "url": `${serverURLs[environment].MONGO_DB}`,
         "user": `${serverURLs[environment].MONGO_USER}`,

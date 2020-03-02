@@ -1,16 +1,20 @@
 var request = require("request");
+var {config} = require("../Utilities/config");
 
 var list_chars = ["f", "b", "e"];
 
 const getTokenTest = () => {
     return new Promise( (resolve, reject ) => {
         setTimeout( ()=>{
+            console.log({access_token:'test'});
             resolve({access_token:'test'});
         }, 10);
     })
 };
 
 const getToken = () => {
+    if (config.ENV == 'dev')
+        return getTokenTest();
     return new Promise( (resolve, reject ) => {
         let url = "https://api-seguridad.sunat.gob.pe/v1/clientesextranet/1491ed63-edcd-451c-98bf-08a12b257de6/oauth2/token/";
         let client_id = "1491ed63-edcd-451c-98bf-08a12b257de6";
@@ -96,6 +100,5 @@ const getResponse = (cmp, token) => {
 
 module.exports = {
     getToken,
-    getResponse,
-    getTokenTest
+    getResponse
 }

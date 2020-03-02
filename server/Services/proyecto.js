@@ -12,7 +12,7 @@ const parser = require('fast-xml-parser');
 const xlsx = require('node-xlsx');
 const zip = require('express-zip');
 
-const mail = require('../Utilities/mail');
+const {sendEmail} = require('../Utilities/mail');
 //const daemon = require('../daemon');
 
 let get = async(req, res) => {
@@ -414,6 +414,8 @@ const procesar = async(id) => {
               let res = await Sunat.getResponse(docum, token);
               await XmlDao.SetVerification(cadaxml._id, res);
               ares.push(res);
+              if (token == "test")
+                throw new Error("Warning: Esta en modo TEST, retorno no válido");
             } catch (error){
               await XmlDao.SetError(cadaxml._id, error.message);
             }
@@ -426,6 +428,7 @@ const procesar = async(id) => {
             global.socketio.emit("refresh", {user: proy.user, proy: proy._id.toString()});
             //let info = await mail.sendAvisoFin(proy);
             //console.log('[Mail]', info);
+            
             return proy;
           }
         }
@@ -457,7 +460,7 @@ const GeneraExcel = async(proy) => {
             "success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"]
         ];
         */
-        let cabEstado = ["success", "message", "estadoCP", "estadoRuc", "condDomiRuc", "obs1", "obs2"];
+        let cabEstado = ["success", "message", "estadoCP", "estadoRuc", "condDomiRuc"]; //, "obs1", "obs2"];
         let headers = [];
         for (let cadadef of def){
           if (cadadef.items){
@@ -489,7 +492,7 @@ const GeneraExcel = async(proy) => {
           let row = Object.values(item.doc);
           if (row.length == 0)
             row = headers.map(val=>{return "";});
-          let rowEstado = [item.success, item.message, desc.cp, desc.ruc, desc.domiruc, desc.obs1, desc.obs2];
+          let rowEstado = [item.success, item.message, desc.cp, desc.ruc, desc.domiruc]; //, desc.obs1, desc.obs2];
           row = row.concat(rowEstado);
           dataxls.push(row);
         }

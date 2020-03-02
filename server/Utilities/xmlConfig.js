@@ -14,9 +14,13 @@ let defDefault =
 
         {"name": "moneda", "path": ["cac:LegalMonetaryTotal/cbc:PayableAmount/attr/@_currencyID",
                                     "cac:RequestedMonetaryTotal/cbc:PayableAmount/attr/@_currencyID"], "desc": "Moneda"},
+
+        {"name": "line", "path": ["cac:InvoiceLine", "cac:CreditNoteLine", "cac:DebitNoteLine"], "desc": "Linea", "items": [
+            {"name": "base_imponible", "path": "cbc:LineExtensionAmount", "desc":"Base Imponible", "group": "first"},
+        ]},
+        {"name": "igv", "path": "cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
         {"name": "total", "path": ["cac:LegalMonetaryTotal/cbc:PayableAmount",
                                     "cac:RequestedMonetaryTotal/cbc:PayableAmount"], "desc": "Total"},
-        {"name": "igv", "path": "cac:TaxTotal/cbc:TaxAmount", "desc": "Igv"},
         
         {"name": "ruccli", "path": ["cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification/cbc:ID",
                                     "cac:AccountingCustomerParty/cbc:CustomerAssignedAccountID"], "desc": "Ruc Cliente"},
@@ -24,7 +28,6 @@ let defDefault =
         {"name": "nomcli", "path": "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName", "desc": "Nombre Cliente"},
         
         {"name": "line", "path": ["cac:InvoiceLine", "cac:CreditNoteLine", "cac:DebitNoteLine"], "desc": "Linea", "items": [
-            {"name": "base_imponible", "path": "cbc:LineExtensionAmount", "desc":"Base Imponible", "group": "first"},
             {"name": "glosa", "path": "cac:Item/cbc:Description", "desc": "Glosa", "group": "first"}
         ]},
 
