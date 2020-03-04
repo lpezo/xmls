@@ -1,4 +1,4 @@
-const optxml = require("../Utilities/config").optxml;
+const {config, optxml} = require("../Utilities/config");
 const {getDoc, def} = require("../Utilities/xmlConfig");
 const ProyectoDAO = require('../DAO/proyectoDAO');
 const XmlDao = require('../DAO/xmlDAO');
@@ -363,7 +363,8 @@ const procesar = async(id) => {
         for (let file of data.files){
           console.log('file:', file);
           let dataxml = await extraeDeXml(data.dir, file);
-          //fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
+          //if (config.ENV == 'dev')
+          //  fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           let name = path.parse(file).name;
           try {
             doc = getDoc(dataxml);

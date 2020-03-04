@@ -32,6 +32,18 @@ const mailjet = require ('node-mailjet')
         */
     }
 
+
+    const testmail = () => {
+        sendEmail('lpezo777@gmail.com', "prueba xml", "<p>Este es un ejemplo en mail jet en azurez</p>").then((result) => {
+            console.log(result);
+        })
+        .catch((err) => {
+            console.log(err.Messages)
+        })
+    }
+
+testmail();
+
 module.export = {
     sendEmail
 }

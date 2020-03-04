@@ -190,7 +190,7 @@ const getobj = (data, item) => {
     if (obj != null){
         if (obj.__cdata)
             obj = obj.__cdata;
-        else if (obj["#text"])
+        else if (obj.hasOwnProperty("#text"))
             obj = obj["#text"];
     }
     return obj;
@@ -198,5 +198,6 @@ const getobj = (data, item) => {
 
 module.exports = {
     getDoc,
-    def: defDefault
+    def: defDefault,
+    getobj
 };
