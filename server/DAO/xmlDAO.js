@@ -67,7 +67,7 @@ const createXml = objToSave =>
       });
   });
 
-  const saveXml = (idproy, iduser, name, doc, otro) => {
+  const saveXml = (idproy, iduser, name, filename, doc, otro) => {
       return new Promise((resolve, reject) => {
         let user = typeof(iduser) == 'string' ? mongoose.Types.ObjectId(iduser) : iduser;
         let criteria = {
@@ -78,7 +78,7 @@ const createXml = objToSave =>
           let aname = name.split('-');
           doc.tipodoc = aname.length > 1 ? aname[1] : '';
         }
-        let toupd = Object.assign({user: user, doc: doc}, otro);
+        let toupd = Object.assign({user: user, doc: doc, filename: filename}, otro);
         if (!toupd.status)
           toupd.status = 'ok';
 

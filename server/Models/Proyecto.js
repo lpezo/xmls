@@ -15,6 +15,9 @@ let User = new Schema({
         default: null,
         required: true
     },
+    filename: {
+        type: String
+    },
     created: {
         type: Date,
         default: Date.now()

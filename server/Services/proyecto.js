@@ -11,8 +11,9 @@ const path = require('path');
 const parser = require('fast-xml-parser');
 const xlsx = require('node-xlsx');
 const zip = require('express-zip');
+var sanitize = require("sanitize-filename");
 
-const {sendEmail} = require('../Utilities/mail');
+//const {sendEmail} = require('../Utilities/mail');
 //const daemon = require('../daemon');
 
 let get = async(req, res) => {
@@ -366,17 +367,18 @@ const procesar = async(id) => {
           //if (config.ENV == 'dev')
           //  fs.writeFileSync(path.join(data.dir, file + ".json"), JSON.stringify(dataxml));
           let name = path.parse(file).name;
+          let filename = sanitize(name);
           try {
             doc = getDoc(dataxml);
             if (doc.num)
-              await XmlDao.saveXml(proy._id, proy.user, name, doc, {});
+              await XmlDao.saveXml(proy._id, proy.user, name, filename, doc, {});
             else
-              await XmlDao.saveXml(proy._id, proy.user, name, doc, {status:'error', message:'Error en leer xml'});
+              await XmlDao.saveXml(proy._id, proy.user, name, filename, doc, {status:'error', message:'Error en leer xml'});
             mueve(data.dir, dirbak, file);
           }
           catch (error) {
             console.log(error.message);
-            await XmlDao.saveXml(proy._id, proy.user, name, doc, {status:'error', message:error.message});
+            await XmlDao.saveXml(proy._id, proy.user, name, filename, doc, {status:'error', message:error.message});
             mueve(data.dir, dirbak, file);
           }
           

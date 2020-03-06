@@ -26,6 +26,7 @@
     "node-mailjet": "^3.3.1",
     "node-xlsx": "^0.15.0",
     "request": "^2.88.2",
+    "sanitize-filename": "^1.6.3",
     "socket.io": "^2.3.0"
   }
 }
