@@ -1,0 +1,1 @@
+echo "alias chaumon='xset dpms force off'" | tee -a ~/.bashrc > /dev/null

@@ -9,7 +9,9 @@ router.post("/register", authService.register);
 /* User Login. */
 router.post("/login", authService.login);
 
-
 /* env */
 router.get("/env", authService.env);
+
+router.get("/existsadmin", authService.existsadmin);
+
 module.exports = router;

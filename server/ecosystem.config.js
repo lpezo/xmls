@@ -1,8 +1,8 @@
 module.exports = {
   apps : [{
     name: "server",
-    script: "/opt/projects/xmls/server/server.js",
-    path: "/opt/projects/xmls/server",
+    script: "server.js",
+    path: ".",
     watch: false,
     env: {
       NODE_ENV: "dev",
@@ -15,9 +15,10 @@ module.exports = {
   },
   {
     name: "daemon",
-    script: "/opt/projects/xmls/server/daemon.js",
-    path: "/opt/projects/xmls/server",
+    script: "daemon.js",
+    path: ".",
     watch: false,
+    enable: false,
     env: {
        NODE_ENV: "dev",
        PORT:3000

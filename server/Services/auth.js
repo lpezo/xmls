@@ -22,7 +22,8 @@ let register = async (req, res) => {
           email: req.body.email,
           phone: req.body.phone,
           password: MD5(MD5(req.body.password)),
-          status: true
+          status: true,
+          isAdmin: req.body.isAdmin || false
         };
         const addUser = await UserDAO.createUser(userData);
         // console
@@ -33,7 +34,7 @@ let register = async (req, res) => {
         }
       }
     } catch (error) {
-      res.status(404).json({message:"Something went wrong",error:error});
+      res.status(404).json({message:"Something went wrong",error:error.message});
     }
   }
 };
@@ -65,9 +66,23 @@ let login = async (req, res) => {
         res.status(401).json({message:'Email not exist!'});
       }
     } catch (error) {
-      res.status(401).json({message:'Something went wrong',error:error});
+      res.status(401).json({message:'Something went wrong',error:error.message});
     }
   }
+};
+
+let existsadmin = async (req, res) => {
+  try{
+    const exists = await UserDAO.getUsers({isAdmin:true});
+    if (exists && exists.length > 0)
+      res.status(200).json({message:'Existe admin!',result:true});
+    else
+    res.status(200).json({message:'No existe admin!',result:false});
+  }
+  catch (error){
+    res.status(401).json({message:'Something went wrong',error:error.message});
+  }
+
 };
 
 let env = async (req, res) => {
@@ -75,7 +90,8 @@ let env = async (req, res) => {
 }
 
 module.exports = {
-  register: register,
-  login: login,
-  env: env
+  register,
+  login,
+  env,
+  existsadmin
 }

@@ -6,10 +6,18 @@ let serverURLs = {
     "dev": {
         "NODE_SERVER": "http://localhost",
         "NODE_SERVER_PORT": "3000",
-        "MONGO_DB": "mongodb://localhost:27017/angular-login-register",
+        "MONGO_DB": "mongodb://localhost:27017/myxml",
         "MONGO_USER": null,
         "MONGO_PWD": null,
         "WAITDAEMON": 10000
+    },
+    "production_local": {
+        "NODE_SERVER": process.env.HOST || "http://localhost",
+        "NODE_SERVER_PORT": process.env.PORT || 3000,
+        "MONGO_DB": "mongodb://localhost:27017/serverxml",
+        "MONGO_USER": null,
+        "MONGO_PWD": null,
+        "WAITDAEMON": 15000
     },
     "production": {
         "NODE_SERVER": process.env.HOST || "http://localhost",
